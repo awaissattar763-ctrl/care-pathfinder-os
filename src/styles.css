@@ -93,6 +93,11 @@
   --gradient-soft: linear-gradient(180deg, oklch(0.98 0.012 215), oklch(0.96 0.02 200));
   --shadow-card: 0 1px 2px oklch(0.4 0.05 230 / 0.04), 0 8px 24px -12px oklch(0.4 0.05 230 / 0.12);
   --shadow-glow: 0 10px 40px -10px oklch(0.62 0.12 200 / 0.35);
+  --shadow-hover: 0 4px 12px -2px oklch(0.4 0.05 230 / 0.08), 0 16px 40px -16px oklch(0.62 0.12 200 / 0.25);
+  --urgent: oklch(0.6 0.22 25);
+  --routine: oklch(0.78 0.15 75);
+  --stable: oklch(0.68 0.14 160);
+  --grid-bg: radial-gradient(oklch(0.62 0.12 200 / 0.06) 1px, transparent 1px);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -151,5 +156,37 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    background-image: var(--grid-bg);
+    background-size: 28px 28px;
   }
+
+  *:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  button, a, [role="button"] {
+    transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
+  }
+}
+
+@layer utilities {
+  @keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes shimmer {
+    0% { background-position: -800px 0; }
+    100% { background-position: 800px 0; }
+  }
+  .animate-fade-in-up { animation: fade-in-up 0.4s ease-out both; }
+  .card-hover { transition: transform 200ms ease, box-shadow 200ms ease; }
+  .card-hover:hover { transform: scale(1.02); box-shadow: var(--shadow-hover); }
+  .shimmer {
+    background: linear-gradient(90deg, transparent, oklch(0.62 0.12 200 / 0.08), transparent);
+    background-size: 800px 100%;
+    animation: shimmer 1.6s linear infinite;
+  }
+  .label-eyebrow { font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 500; color: var(--muted-foreground); }
 }
