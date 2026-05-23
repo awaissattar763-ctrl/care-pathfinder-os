@@ -9,8 +9,56 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TelemedicineRouteImport } from './routes/telemedicine'
+import { Route as SymptomCheckerRouteImport } from './routes/symptom-checker'
+import { Route as PrescriptionsRouteImport } from './routes/prescriptions'
+import { Route as PatientsRouteImport } from './routes/patients'
+import { Route as ComplianceRouteImport } from './routes/compliance'
+import { Route as ClaimsRouteImport } from './routes/claims'
+import { Route as AppointmentsRouteImport } from './routes/appointments'
+import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as IndexRouteImport } from './routes/index'
 
+const TelemedicineRoute = TelemedicineRouteImport.update({
+  id: '/telemedicine',
+  path: '/telemedicine',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SymptomCheckerRoute = SymptomCheckerRouteImport.update({
+  id: '/symptom-checker',
+  path: '/symptom-checker',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrescriptionsRoute = PrescriptionsRouteImport.update({
+  id: '/prescriptions',
+  path: '/prescriptions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PatientsRoute = PatientsRouteImport.update({
+  id: '/patients',
+  path: '/patients',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComplianceRoute = ComplianceRouteImport.update({
+  id: '/compliance',
+  path: '/compliance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClaimsRoute = ClaimsRouteImport.update({
+  id: '/claims',
+  path: '/claims',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppointmentsRoute = AppointmentsRouteImport.update({
+  id: '/appointments',
+  path: '/appointments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnalyticsRoute = AnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +67,144 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
+  '/appointments': typeof AppointmentsRoute
+  '/claims': typeof ClaimsRoute
+  '/compliance': typeof ComplianceRoute
+  '/patients': typeof PatientsRoute
+  '/prescriptions': typeof PrescriptionsRoute
+  '/symptom-checker': typeof SymptomCheckerRoute
+  '/telemedicine': typeof TelemedicineRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
+  '/appointments': typeof AppointmentsRoute
+  '/claims': typeof ClaimsRoute
+  '/compliance': typeof ComplianceRoute
+  '/patients': typeof PatientsRoute
+  '/prescriptions': typeof PrescriptionsRoute
+  '/symptom-checker': typeof SymptomCheckerRoute
+  '/telemedicine': typeof TelemedicineRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
+  '/appointments': typeof AppointmentsRoute
+  '/claims': typeof ClaimsRoute
+  '/compliance': typeof ComplianceRoute
+  '/patients': typeof PatientsRoute
+  '/prescriptions': typeof PrescriptionsRoute
+  '/symptom-checker': typeof SymptomCheckerRoute
+  '/telemedicine': typeof TelemedicineRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/analytics'
+    | '/appointments'
+    | '/claims'
+    | '/compliance'
+    | '/patients'
+    | '/prescriptions'
+    | '/symptom-checker'
+    | '/telemedicine'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/analytics'
+    | '/appointments'
+    | '/claims'
+    | '/compliance'
+    | '/patients'
+    | '/prescriptions'
+    | '/symptom-checker'
+    | '/telemedicine'
+  id:
+    | '__root__'
+    | '/'
+    | '/analytics'
+    | '/appointments'
+    | '/claims'
+    | '/compliance'
+    | '/patients'
+    | '/prescriptions'
+    | '/symptom-checker'
+    | '/telemedicine'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AnalyticsRoute: typeof AnalyticsRoute
+  AppointmentsRoute: typeof AppointmentsRoute
+  ClaimsRoute: typeof ClaimsRoute
+  ComplianceRoute: typeof ComplianceRoute
+  PatientsRoute: typeof PatientsRoute
+  PrescriptionsRoute: typeof PrescriptionsRoute
+  SymptomCheckerRoute: typeof SymptomCheckerRoute
+  TelemedicineRoute: typeof TelemedicineRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/telemedicine': {
+      id: '/telemedicine'
+      path: '/telemedicine'
+      fullPath: '/telemedicine'
+      preLoaderRoute: typeof TelemedicineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/symptom-checker': {
+      id: '/symptom-checker'
+      path: '/symptom-checker'
+      fullPath: '/symptom-checker'
+      preLoaderRoute: typeof SymptomCheckerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/prescriptions': {
+      id: '/prescriptions'
+      path: '/prescriptions'
+      fullPath: '/prescriptions'
+      preLoaderRoute: typeof PrescriptionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/patients': {
+      id: '/patients'
+      path: '/patients'
+      fullPath: '/patients'
+      preLoaderRoute: typeof PatientsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compliance': {
+      id: '/compliance'
+      path: '/compliance'
+      fullPath: '/compliance'
+      preLoaderRoute: typeof ComplianceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/claims': {
+      id: '/claims'
+      path: '/claims'
+      fullPath: '/claims'
+      preLoaderRoute: typeof ClaimsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/appointments': {
+      id: '/appointments'
+      path: '/appointments'
+      fullPath: '/appointments'
+      preLoaderRoute: typeof AppointmentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/analytics': {
+      id: '/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,17 +217,15 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AnalyticsRoute: AnalyticsRoute,
+  AppointmentsRoute: AppointmentsRoute,
+  ClaimsRoute: ClaimsRoute,
+  ComplianceRoute: ComplianceRoute,
+  PatientsRoute: PatientsRoute,
+  PrescriptionsRoute: PrescriptionsRoute,
+  SymptomCheckerRoute: SymptomCheckerRoute,
+  TelemedicineRoute: TelemedicineRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
