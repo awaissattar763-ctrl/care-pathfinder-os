@@ -9,7 +9,9 @@ import {
   Video,
   FileText,
   Sparkles,
+  Lock,
 } from "lucide-react";
+import { UrgencyBadge } from "@/components/UrgencyBadge";
 
 export const Route = createFileRoute("/")({
   component: Index,
