@@ -139,39 +139,3 @@ function Index() {
     </div>
   );
 }
-                </div>
-                <span className={`text-[11px] px-2 py-1 rounded-full font-medium ${a.tele ? "bg-accent text-accent-foreground" : "bg-secondary text-secondary-foreground"}`}>
-                  {a.status}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Activity */}
-        <div className="rounded-xl border border-border bg-card" style={{ boxShadow: "var(--shadow-card)" }}>
-          <div className="px-5 py-4 border-b border-border">
-            <div className="font-semibold tracking-tight">Recent activity</div>
-            <div className="text-xs text-muted-foreground">Last 24 hours</div>
-          </div>
-          <ul className="p-3 space-y-1">
-            {activity.map((a, i) => {
-              const Icon = a.icon;
-              return (
-                <li key={i} className="flex items-start gap-3 p-2 rounded-lg hover:bg-secondary/50">
-                  <div className="size-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                    <Icon className="size-4" />
-                  </div>
-                  <div className="text-sm text-foreground/85 leading-snug">{a.text}</div>
-                </li>
-              );
-            })}
-          </ul>
-          <div className="px-5 py-3 border-t border-border flex items-center gap-2 text-xs text-muted-foreground">
-            <Clock className="size-3.5" /> Synced just now
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
