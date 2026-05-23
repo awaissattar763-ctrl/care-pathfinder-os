@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Fragment } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -57,8 +58,8 @@ function AppointmentsPage() {
           ))}
 
           {hours.map((h, hi) => (
-            <>
-              <div key={`h-${hi}`} className="border-b border-r border-border px-2 py-3 text-[11px] text-muted-foreground tabular-nums text-right">
+            <Fragment key={`row-${hi}`}>
+              <div className="border-b border-r border-border px-2 py-3 text-[11px] text-muted-foreground tabular-nums text-right">
                 {h}
               </div>
               {days.map((_, di) => {
@@ -77,7 +78,7 @@ function AppointmentsPage() {
                   </div>
                 );
               })}
-            </>
+            </Fragment>
           ))}
         </div>
       </div>
