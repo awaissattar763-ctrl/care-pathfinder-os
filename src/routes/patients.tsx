@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHeader } from "@/components/PageHeader";
 import { Plus, Filter, FileText, Lock, ShieldCheck } from "lucide-react";
 import { UrgencyBadge, type Urgency } from "@/components/UrgencyBadge";
@@ -80,9 +80,13 @@ function PatientsPage() {
                     <a href="#" className="text-xs text-muted-foreground hover:text-primary" title="Audit trail">
                       <ShieldCheck className="size-3.5" aria-label="View audit trail" />
                     </a>
-                    <button className="inline-flex items-center gap-1.5 text-xs text-primary font-medium hover:underline">
+                    <Link
+                      to="/patients/$patientId"
+                      params={{ patientId: p.id }}
+                      className="inline-flex items-center gap-1.5 text-xs text-primary font-medium hover:underline"
+                    >
                       <FileText className="size-3.5" aria-hidden /> Chart
-                    </button>
+                    </Link>
                   </div>
                 </td>
               </tr>
