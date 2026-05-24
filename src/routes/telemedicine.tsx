@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Mic, MicOff, Video as VideoIcon, VideoOff, PhoneOff, MonitorUp, MessageSquare,
   ShieldCheck, Lock, Signal, Sparkles, FileSignature, Paperclip, Send, Pill,
@@ -720,6 +720,3 @@ function formatTime(total: number) {
   const pad = (n: number) => n.toString().padStart(2, "0");
   return h > 0 ? `${pad(h)}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
 }
-
-// Suppress unused import warnings for icons reserved for future controls
-void useMemo; void CtrlBtn;
