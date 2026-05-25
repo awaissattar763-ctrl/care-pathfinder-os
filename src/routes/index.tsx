@@ -12,6 +12,7 @@ import {
   Lock,
 } from "lucide-react";
 import { UrgencyBadge } from "@/components/UrgencyBadge";
+import { AIInsightCard } from "@/components/copilot/AIInsightCard";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -109,6 +110,17 @@ function Index() {
           </ul>
         </div>
 
+        <div className="space-y-4">
+          <AIInsightCard
+            title="3 charts ready for a copilot review"
+            summary="Priya Anand has an abnormal CBC trend; Maya Chen's BP is creeping above goal; Rosa Lin is due for a post-op review."
+            suggestions={[
+              { label: "Summarize Priya's chart", prompt: "Summarize Priya Anand's recent labs and prior visits, highlighting the abnormal CBC trend and proposed next steps." },
+              { label: "Draft BP plan for Maya", prompt: "Draft a hypertension management update for Maya Chen, including lifestyle and medication titration options. Use SOAP." },
+              { label: "Triage today's inbox", prompt: "Help me triage today's appointment requests by urgency and recommend in-person vs telemedicine." },
+            ]}
+          />
+
         {/* Activity */}
         <div className="rounded-xl border border-border bg-card card-hover" style={{ boxShadow: "var(--shadow-card)" }}>
           <div className="px-6 py-5 border-b border-border">
@@ -136,6 +148,7 @@ function Index() {
             <span className="flex items-center gap-2"><Clock className="size-3.5" aria-hidden /> Synced just now</span>
             <a href="#" className="text-primary font-medium hover:underline">Audit trail →</a>
           </div>
+        </div>
         </div>
       </div>
     </div>

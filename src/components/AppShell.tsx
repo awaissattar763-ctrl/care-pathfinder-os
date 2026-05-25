@@ -15,6 +15,8 @@ import {
   Lock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { CopilotProvider, useCopilot } from "@/components/copilot/CopilotContext";
+import { AICopilot, CopilotLauncher } from "@/components/copilot/AICopilot";
 
 const nav = [
   { to: "/", label: "Overview", icon: LayoutDashboard },
@@ -32,6 +34,7 @@ export function AppShell() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   return (
+    <CopilotProvider>
     <div className="min-h-screen bg-background text-foreground">
       <div className="flex">
         {/* Sidebar */}
@@ -96,6 +99,7 @@ export function AppShell() {
                   ⌘K
                 </kbd>
               </div>
+              <CopilotHeaderButton />
               <button
                 className="size-10 rounded-lg hover:bg-secondary flex items-center justify-center text-muted-foreground relative hover:shadow-sm"
                 aria-label="Notifications (2 unread)"
@@ -125,6 +129,25 @@ export function AppShell() {
           </footer>
         </main>
       </div>
+      <CopilotLauncher />
+      <AICopilot />
     </div>
+    </CopilotProvider>
+  );
+}
+
+function CopilotHeaderButton() {
+  const { openCopilot } = useCopilot();
+  return (
+    <button
+      onClick={() => openCopilot()}
+      title="Open Copilot (⌘J)"
+      aria-label="Open Copilot"
+      className="hidden md:inline-flex items-center gap-2 h-10 px-3 rounded-lg border border-border bg-background hover:border-primary/40 hover:text-primary text-xs font-medium text-muted-foreground transition"
+    >
+      <Sparkles className="size-3.5 text-primary" />
+      Copilot
+      <kbd className="ml-1 px-1.5 py-0.5 rounded bg-secondary text-[10px] text-muted-foreground">⌘J</kbd>
+    </button>
   );
 }
