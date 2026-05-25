@@ -12,6 +12,7 @@ import {
   Lock,
 } from "lucide-react";
 import { UrgencyBadge } from "@/components/UrgencyBadge";
+import { AIInsightCard } from "@/components/copilot/AIInsightCard";
 
 export const Route = createFileRoute("/")({
   component: Index,
