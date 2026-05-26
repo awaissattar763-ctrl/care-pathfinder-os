@@ -277,7 +277,7 @@ function AnalyticsPage() {
         <AIInsightCard
           title="Operational insight"
           summary="Telemedicine adoption grew 6.2% MoM, offsetting a 2.3% dip in walk-ins. Dr. Reilly's panel is 19% under capacity — reallocating 8 weekly slots could lift conversion ~$11.4K/mo."
-          actions={[
+          suggestions={[
             { label: "View suggested schedule" },
             { label: "Email to leadership" },
           ]}
