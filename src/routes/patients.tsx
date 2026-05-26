@@ -33,9 +33,9 @@ function PatientsPage() {
         }
       />
 
-      <div className="rounded-xl border border-border bg-card overflow-hidden" style={{ boxShadow: "var(--shadow-card)" }}>
+      <div className="rounded-xl border border-border bg-card overflow-hidden lift-on-hover" style={{ boxShadow: "var(--shadow-card)" }}>
         <table className="w-full text-sm">
-          <thead className="bg-secondary/60 text-muted-foreground text-[11px] uppercase tracking-wider">
+          <thead className="sticky top-0 z-10 bg-secondary/70 backdrop-blur text-muted-foreground text-[11px] uppercase tracking-wider">
             <tr>
               <th className="text-left font-semibold px-6 py-4">Patient</th>
               <th className="text-left font-semibold px-6 py-4">ID</th>
@@ -50,7 +50,7 @@ function PatientsPage() {
             {patients.map((p, i) => (
               <tr
                 key={p.id}
-                className="hover:bg-secondary/40 transition animate-fade-in-up"
+                className="table-row-hover animate-fade-in-up"
                 style={{ animationDelay: `${i * 50}ms` }}
               >
                 <td className="px-6 py-4">
