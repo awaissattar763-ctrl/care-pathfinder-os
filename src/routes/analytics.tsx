@@ -278,8 +278,8 @@ function AnalyticsPage() {
           title="Operational insight"
           summary="Telemedicine adoption grew 6.2% MoM, offsetting a 2.3% dip in walk-ins. Dr. Reilly's panel is 19% under capacity — reallocating 8 weekly slots could lift conversion ~$11.4K/mo."
           suggestions={[
-            { label: "View suggested schedule" },
-            { label: "Email to leadership" },
+            { label: "View suggested schedule", prompt: "Suggest an optimal weekly schedule reallocating 8 slots from Dr. Reilly." },
+            { label: "Email to leadership", prompt: "Draft an executive email summarizing this week's operational insight." },
           ]}
         />
       </div>
