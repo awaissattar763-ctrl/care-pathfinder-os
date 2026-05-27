@@ -303,4 +303,103 @@
 
   /* Number flow */
   .tabular { font-variant-numeric: tabular-nums; }
+
+  /* ============================================================
+   * Platform UX primitives — unified across every HealthOS page
+   * ============================================================ */
+
+  /* Surface — every section/list/table card */
+  .surface {
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+  }
+
+  /* Section header inside a surface (title row above content) */
+  .section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-head__title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--foreground);
+  }
+  .section-head__sub {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+    margin-top: 0.125rem;
+  }
+
+  /* Buttons — unified treatments */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+    height: 2.25rem; padding: 0 0.875rem;
+    font-size: 0.8125rem; font-weight: 500;
+    border-radius: 0.5rem;
+    transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease, box-shadow 200ms ease, transform 120ms ease;
+    white-space: nowrap;
+  }
+  .btn:active { transform: translateY(0.5px); }
+  .btn-primary {
+    color: var(--primary-foreground);
+    background: var(--gradient-primary);
+    box-shadow: 0 1px 0 0 color-mix(in oklab, var(--primary) 30%, transparent);
+  }
+  .btn-primary:hover { box-shadow: var(--shadow-glow); }
+  .btn-secondary {
+    background: var(--card);
+    color: var(--foreground);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { background: color-mix(in oklab, var(--secondary) 70%, transparent); }
+  .btn-ghost { background: transparent; color: var(--muted-foreground); }
+  .btn-ghost:hover { background: var(--secondary); color: var(--foreground); }
+  .btn-sm { height: 2rem; padding: 0 0.625rem; font-size: 0.75rem; border-radius: 0.4375rem; }
+
+  /* Status pill — single source of truth */
+  .pill {
+    display: inline-flex; align-items: center; gap: 0.25rem;
+    font-size: 0.6875rem; font-weight: 500;
+    padding: 0.125rem 0.5rem;
+    border-radius: 999px;
+    line-height: 1.25rem;
+    white-space: nowrap;
+  }
+  .pill--success { background: color-mix(in oklab, var(--success) 15%, transparent); color: var(--success); }
+  .pill--warning { background: color-mix(in oklab, var(--warning) 18%, transparent); color: var(--warning); }
+  .pill--danger  { background: color-mix(in oklab, var(--destructive) 15%, transparent); color: var(--destructive); }
+  .pill--info    { background: color-mix(in oklab, var(--primary) 12%, transparent); color: var(--primary); }
+  .pill--neutral { background: var(--secondary); color: var(--secondary-foreground); }
+
+  /* Unified data table */
+  .data-table { width: 100%; font-size: 0.875rem; border-collapse: separate; border-spacing: 0; }
+  .data-table thead th {
+    position: sticky; top: 0; z-index: 1;
+    text-align: left;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted-foreground);
+    background: color-mix(in oklab, var(--secondary) 75%, transparent);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--border);
+  }
+  .data-table tbody td {
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .data-table tbody tr:last-child td { border-bottom: 0; }
+  .data-table tbody tr { transition: background-color 140ms ease, box-shadow 140ms ease; }
+  .data-table tbody tr:hover {
+    background: color-mix(in oklab, var(--primary) 4%, transparent);
+    box-shadow: inset 2px 0 0 0 var(--primary);
+  }
 }

@@ -6,7 +6,7 @@ import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
 export const Route = createFileRoute("/appointments")({ component: AppointmentsPage });
 
 const hours = ["8:00", "9:00", "10:00", "11:00", "12:00", "1:00", "2:00", "3:00", "4:00", "5:00"];
-const days = ["Mon 19", "Tue 20", "Wed 21", "Thu 22", "Fri 23"];
+const days = ["Mon 25", "Tue 26", "Wed 27", "Thu 28", "Fri 29"];
 
 type Appt = { day: number; hour: number; len: number; name: string; type: string; tone: "primary" | "accent" | "success" };
 const appts: Appt[] = [
@@ -31,24 +31,22 @@ function AppointmentsPage() {
   return (
     <div>
       <PageHeader
-        eyebrow="May 19 – May 23"
+        eyebrow="May 25 – May 29, 2026"
         title="Appointments"
         description="Book, reschedule, and run your weekly clinic."
         actions={
           <>
-            <div className="flex items-center border border-border rounded-lg bg-card">
-              <button className="h-10 w-10 flex items-center justify-center text-muted-foreground hover:text-foreground"><ChevronLeft className="size-4" /></button>
-              <div className="px-3 text-sm font-medium">This week</div>
-              <button className="h-10 w-10 flex items-center justify-center text-muted-foreground hover:text-foreground"><ChevronRight className="size-4" /></button>
+            <div className="flex items-center border border-border rounded-lg bg-card overflow-hidden">
+              <button className="h-9 w-9 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary" aria-label="Previous week"><ChevronLeft className="size-4" /></button>
+              <div className="px-3 text-xs font-medium border-x border-border h-9 flex items-center">This week</div>
+              <button className="h-9 w-9 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary" aria-label="Next week"><ChevronRight className="size-4" /></button>
             </div>
-            <button className="inline-flex items-center gap-2 h-10 px-4 rounded-lg text-sm font-medium text-primary-foreground" style={{ background: "var(--gradient-primary)" }}>
-              <Plus className="size-4" /> Book
-            </button>
+            <button className="btn btn-primary"><Plus className="size-4" /> Book</button>
           </>
         }
       />
 
-      <div className="rounded-xl border border-border bg-card overflow-hidden" style={{ boxShadow: "var(--shadow-card)" }}>
+      <div className="surface">
         <div className="grid" style={{ gridTemplateColumns: "70px repeat(5, minmax(0, 1fr))" }}>
           <div className="border-b border-r border-border bg-secondary/40" />
           {days.map((d) => (
