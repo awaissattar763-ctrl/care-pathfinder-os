@@ -45,34 +45,35 @@ function Index() {
   return (
     <div>
       <PageHeader
-        eyebrow="Wednesday, May 23"
+        eyebrow="Wednesday · May 27, 2026"
         title="Good morning, Dr. Reyes"
         description="Here's what's happening across your practice today."
         actions={
-          <button className="inline-flex items-center gap-2 h-10 px-4 rounded-lg text-sm font-medium text-primary-foreground transition" style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-glow)" }}>
-            New appointment <ArrowUpRight className="size-4" />
-          </button>
+          <>
+            <button className="btn btn-secondary">Print huddle</button>
+            <button className="btn btn-primary">New appointment <ArrowUpRight className="size-4" /></button>
+          </>
         }
       />
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {stats.map((s, i) => {
           const Icon = s.icon;
           return (
             <div
               key={s.label}
-              className="rounded-xl border border-border bg-card p-6 card-hover animate-fade-in-up"
-              style={{ boxShadow: "var(--shadow-card)", animationDelay: `${i * 50}ms` }}
+              className="surface p-5 lift-on-hover animate-fade-in-up"
+              style={{ animationDelay: `${i * 50}ms` }}
             >
               <div className="flex items-center justify-between">
                 <div className="label-eyebrow">{s.label}</div>
-                <div className="size-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                <div className="size-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center" aria-hidden>
                   <Icon className="size-4" aria-hidden />
                 </div>
               </div>
-              <div className="mt-3 text-3xl font-bold tracking-tight">{s.value}</div>
-              <div className="text-xs text-muted-foreground mt-1">{s.delta}</div>
+              <div className="mt-3 text-[1.625rem] font-semibold tracking-tight tabular-nums">{s.value}</div>
+              <div className="text-[11px] text-muted-foreground mt-1">{s.delta}</div>
             </div>
           );
         })}
@@ -80,19 +81,19 @@ function Index() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Today's schedule */}
-        <div className="lg:col-span-2 rounded-xl border border-border bg-card" style={{ boxShadow: "var(--shadow-card)" }}>
-          <div className="px-6 py-5 border-b border-border flex items-center justify-between">
+        <div className="lg:col-span-2 surface">
+          <div className="section-head">
             <div>
-              <h2 className="text-xl font-semibold tracking-tight">Today's schedule</h2>
-              <div className="text-sm text-muted-foreground">5 appointments · 1 telehealth</div>
+              <div className="section-head__title">Today's schedule</div>
+              <div className="section-head__sub">5 appointments · 1 telehealth · 2 open slots</div>
             </div>
-            <button className="text-sm text-primary font-medium hover:underline">View calendar</button>
+            <button className="btn btn-ghost btn-sm">View calendar</button>
           </div>
           <ul className="divide-y divide-border">
             {schedule.map((a, i) => (
               <li
                 key={a.time}
-                className="px-6 py-4 flex items-center gap-4 hover:bg-secondary/40 transition animate-fade-in-up"
+                className="px-5 py-3.5 flex items-center gap-4 hover:bg-primary/[0.04] transition-colors animate-fade-in-up"
                 style={{ animationDelay: `${i * 50}ms` }}
               >
                 <div className="w-20 shrink-0 text-sm font-medium tabular-nums">{a.time}</div>
@@ -101,10 +102,10 @@ function Index() {
                   <div className="text-xs text-muted-foreground truncate" title={a.reason}>{a.reason}</div>
                 </div>
                 <UrgencyBadge level={a.urgency} />
-                <span className={`text-[11px] px-2 py-1 rounded-full font-medium ${a.tele ? "bg-accent text-accent-foreground" : "bg-secondary text-secondary-foreground"}`}>
+                <span className={a.tele ? "pill pill--info" : "pill pill--neutral"}>
                   {a.status}
                 </span>
-                <Lock className="size-3.5 text-muted-foreground/60" aria-label="Patient data encrypted" />
+                <Lock className="size-3 text-muted-foreground/60" aria-label="PHI encrypted" />
               </li>
             ))}
           </ul>
@@ -122,10 +123,12 @@ function Index() {
           />
 
         {/* Activity */}
-        <div className="rounded-xl border border-border bg-card card-hover" style={{ boxShadow: "var(--shadow-card)" }}>
-          <div className="px-6 py-5 border-b border-border">
-            <h2 className="text-xl font-semibold tracking-tight">Recent activity</h2>
-            <div className="text-sm text-muted-foreground">Last 24 hours</div>
+        <div className="surface">
+          <div className="section-head">
+            <div>
+              <div className="section-head__title">Recent activity</div>
+              <div className="section-head__sub">Last 24 hours</div>
+            </div>
           </div>
           <ul className="p-3 space-y-1">
             {activity.map((a, i) => {
@@ -133,10 +136,10 @@ function Index() {
               return (
                 <li
                   key={i}
-                  className="flex items-start gap-3 p-2.5 rounded-lg hover:bg-secondary/50 animate-fade-in-up"
+                  className="flex items-start gap-3 p-2.5 rounded-lg hover:bg-primary/[0.04] transition-colors animate-fade-in-up"
                   style={{ animationDelay: `${i * 50}ms` }}
                 >
-                  <div className="size-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <div className="size-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0" aria-hidden>
                     <Icon className="size-4" aria-hidden />
                   </div>
                   <div className="text-sm text-foreground/85 leading-snug">{a.text}</div>
@@ -144,7 +147,7 @@ function Index() {
               );
             })}
           </ul>
-          <div className="px-6 py-3 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
+          <div className="px-5 py-3 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
             <span className="flex items-center gap-2"><Clock className="size-3.5" aria-hidden /> Synced just now</span>
             <a href="#" className="text-primary font-medium hover:underline">Audit trail →</a>
           </div>
