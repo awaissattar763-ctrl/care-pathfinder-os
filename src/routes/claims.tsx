@@ -13,59 +13,80 @@ const claims = [
 ];
 
 const tone: Record<string, string> = {
-  Approved: "bg-success/15 text-success",
-  "In review": "bg-warning/15 text-warning",
-  Submitted: "bg-primary/15 text-primary",
-  Denied: "bg-destructive/15 text-destructive",
+  Approved: "pill pill--success",
+  "In review": "pill pill--warning",
+  Submitted: "pill pill--info",
+  Denied: "pill pill--danger",
 };
 
 function ClaimsPage() {
   const totals = [
-    { label: "Submitted MTD", value: "$84,210" },
-    { label: "Approved MTD", value: "$61,930" },
-    { label: "Denial rate", value: "4.2%" },
-    { label: "Avg. days to pay", value: "11.4" },
+    { label: "Submitted MTD", value: "$84,210", delta: "+6.1% vs Apr" },
+    { label: "Approved MTD", value: "$61,930", delta: "73.5% approval" },
+    { label: "Denial rate", value: "4.2%", delta: "-0.8 pts" },
+    { label: "Avg. days to pay", value: "11.4", delta: "Target: <14" },
   ];
   return (
     <div>
-      <PageHeader eyebrow="Revenue cycle" title="Insurance claims" description="Track submissions, follow up on denials, and forecast cashflow." />
+      <PageHeader
+        eyebrow="Revenue cycle"
+        title="Insurance claims"
+        description="Track submissions, follow up on denials, and forecast cashflow."
+        actions={
+          <>
+            <button className="btn btn-secondary">Export 837P</button>
+            <button className="btn btn-primary">New claim</button>
+          </>
+        }
+      />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {totals.map((t) => (
-          <div key={t.label} className="rounded-xl border border-border bg-card p-5" style={{ boxShadow: "var(--shadow-card)" }}>
-            <div className="text-xs text-muted-foreground">{t.label}</div>
-            <div className="text-xl font-semibold tracking-tight mt-2">{t.value}</div>
+        {totals.map((t, i) => (
+          <div
+            key={t.label}
+            className="surface p-5 lift-on-hover animate-fade-in-up"
+            style={{ animationDelay: `${i * 40}ms` }}
+          >
+            <div className="label-eyebrow">{t.label}</div>
+            <div className="text-2xl font-semibold tracking-tight mt-2 tabular-nums">{t.value}</div>
+            <div className="text-[11px] text-muted-foreground mt-1">{t.delta}</div>
           </div>
         ))}
       </div>
 
-      <div className="rounded-xl border border-border bg-card overflow-hidden" style={{ boxShadow: "var(--shadow-card)" }}>
-        <div className="px-5 py-4 border-b border-border flex items-center gap-2">
-          <Receipt className="size-4 text-primary" />
-          <div className="font-semibold tracking-tight">Recent claims</div>
+      <div className="surface">
+        <div className="section-head">
+          <div className="flex items-center gap-2.5">
+            <Receipt className="size-4 text-primary" aria-hidden />
+            <div>
+              <div className="section-head__title">Recent claims</div>
+              <div className="section-head__sub">Last 30 days · {claims.length} submitted</div>
+            </div>
+          </div>
+          <button className="btn btn-ghost btn-sm">Filter</button>
         </div>
-        <table className="w-full text-sm">
-          <thead className="bg-secondary/60 text-muted-foreground text-xs uppercase tracking-wider">
+        <table className="data-table">
+          <thead>
             <tr>
-              <th className="text-left font-medium px-5 py-3">Claim</th>
-              <th className="text-left font-medium px-5 py-3">Patient</th>
-              <th className="text-left font-medium px-5 py-3">Payer</th>
-              <th className="text-left font-medium px-5 py-3">Amount</th>
-              <th className="text-left font-medium px-5 py-3">Status</th>
-              <th className="text-left font-medium px-5 py-3">Submitted</th>
+              <th>Claim</th>
+              <th>Patient</th>
+              <th>Payer</th>
+              <th className="text-right">Amount</th>
+              <th>Status</th>
+              <th>Submitted</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-border">
-            {claims.map((c) => (
-              <tr key={c.id} className="hover:bg-secondary/40">
-                <td className="px-5 py-3.5 font-medium tabular-nums">{c.id}</td>
-                <td className="px-5 py-3.5">{c.patient}</td>
-                <td className="px-5 py-3.5 text-muted-foreground">{c.payer}</td>
-                <td className="px-5 py-3.5 tabular-nums">${c.amount.toLocaleString()}</td>
-                <td className="px-5 py-3.5">
-                  <span className={`text-[11px] px-2 py-1 rounded-full font-medium ${tone[c.status]}`}>{c.status}</span>
+          <tbody>
+            {claims.map((c, i) => (
+              <tr key={c.id} className="animate-fade-in-up" style={{ animationDelay: `${i * 30}ms` }}>
+                <td className="font-medium tabular-nums">{c.id}</td>
+                <td>{c.patient}</td>
+                <td className="text-muted-foreground">{c.payer}</td>
+                <td className="tabular-nums text-right">${c.amount.toLocaleString()}</td>
+                <td>
+                  <span className={tone[c.status]}>{c.status}</span>
                 </td>
-                <td className="px-5 py-3.5 text-muted-foreground">{c.date}</td>
+                <td className="text-muted-foreground">{c.date}</td>
               </tr>
             ))}
           </tbody>
