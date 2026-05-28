@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
-import { Plus, Filter, FileText, Lock, ShieldCheck, Search, Users } from "lucide-react";
+import { Plus, FileText, Lock, ShieldCheck, Search, Users } from "lucide-react";
 import { UrgencyBadge, type Urgency } from "@/components/UrgencyBadge";
 import { usePatients } from "@/hooks/queries";
 import { NewPatientDialog } from "@/components/dialogs/NewPatientDialog";
