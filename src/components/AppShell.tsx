@@ -1,6 +1,8 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { Toaster } from "@/components/ui/sonner";
+import { useAuth } from "@/hooks/use-auth";
+import { LogOut } from "lucide-react";
 import {
   LayoutDashboard,
   Users,
@@ -102,16 +104,7 @@ export function AppShell() {
             })}
           </nav>
           <div className="p-3 border-t border-sidebar-border">
-            <button className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-sidebar-accent/60 text-left" aria-label="Account settings">
-              <div className="size-9 rounded-full bg-primary/15 flex items-center justify-center text-primary font-semibold text-sm">
-                DR
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium truncate">Dr. Reyes</div>
-                <div className="text-[11px] text-muted-foreground truncate">Internal Medicine</div>
-              </div>
-              <Settings className="size-4 text-muted-foreground" aria-hidden />
-            </button>
+            <AccountButton />
           </div>
         </aside>
 
