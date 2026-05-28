@@ -237,3 +237,28 @@ function CopilotHeaderButton() {
     </button>
   );
 }
+function AccountButton() {
+  const { user, roles, signOut } = useAuth();
+  const initials = (user?.email ?? "??").slice(0, 2).toUpperCase();
+  return (
+    <div className="flex items-center gap-2">
+      <button className="flex-1 flex items-center gap-3 p-2 rounded-lg hover:bg-sidebar-accent/60 text-left min-w-0" aria-label="Account">
+        <div className="size-9 rounded-full bg-primary/15 flex items-center justify-center text-primary font-semibold text-sm">
+          {initials}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="text-sm font-medium truncate">{user?.email ?? "Account"}</div>
+          <div className="text-[11px] text-muted-foreground truncate capitalize">{roles[0] ?? "doctor"}</div>
+        </div>
+      </button>
+      <button
+        onClick={() => signOut()}
+        className="size-9 rounded-lg hover:bg-sidebar-accent/60 flex items-center justify-center text-muted-foreground"
+        aria-label="Sign out"
+        title="Sign out"
+      >
+        <LogOut className="size-4" />
+      </button>
+    </div>
+  );
+}
