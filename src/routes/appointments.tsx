@@ -1,84 +1,88 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Fragment } from "react";
 import { PageHeader } from "@/components/PageHeader";
-import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, CalendarDays } from "lucide-react";
+import { useAppointments, useUpdateAppointmentStatus } from "@/hooks/queries";
+import { NewAppointmentDialog } from "@/components/dialogs/NewAppointmentDialog";
+import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/EmptyState";
 
 export const Route = createFileRoute("/appointments")({ component: AppointmentsPage });
 
-const hours = ["8:00", "9:00", "10:00", "11:00", "12:00", "1:00", "2:00", "3:00", "4:00", "5:00"];
-const days = ["Mon 25", "Tue 26", "Wed 27", "Thu 28", "Fri 29"];
+const statusOptions = ["confirmed", "checked-in", "in-progress", "completed", "cancelled", "no-show"];
 
-type Appt = { day: number; hour: number; len: number; name: string; type: string; tone: "primary" | "accent" | "success" };
-const appts: Appt[] = [
-  { day: 0, hour: 1, len: 1, name: "Maya Chen", type: "Follow-up", tone: "primary" },
-  { day: 0, hour: 3, len: 2, name: "Block · Lab review", type: "Admin", tone: "accent" },
-  { day: 1, hour: 0, len: 1, name: "Daniel Ortiz", type: "Physical", tone: "primary" },
-  { day: 1, hour: 4, len: 1, name: "Sam Whitaker", type: "Telehealth", tone: "success" },
-  { day: 2, hour: 2, len: 1, name: "Priya Anand", type: "Lab review", tone: "primary" },
-  { day: 2, hour: 5, len: 1, name: "Rosa Lin", type: "Post-op", tone: "primary" },
-  { day: 3, hour: 1, len: 2, name: "Group · Wellness", type: "Workshop", tone: "accent" },
-  { day: 4, hour: 0, len: 1, name: "Jonas Becker", type: "New patient", tone: "primary" },
-  { day: 4, hour: 3, len: 1, name: "Maya Chen", type: "Telehealth", tone: "success" },
-];
-
-const toneClass = {
-  primary: "bg-primary/12 text-primary border-primary/25",
-  accent: "bg-accent text-accent-foreground border-accent",
-  success: "bg-success/15 text-success border-success/30",
+const statusTone: Record<string, string> = {
+  confirmed: "pill pill--info",
+  "checked-in": "pill pill--warning",
+  "in-progress": "pill pill--warning",
+  completed: "pill pill--success",
+  cancelled: "pill pill--neutral",
+  "no-show": "pill pill--danger",
 };
 
 function AppointmentsPage() {
+  const { data, isLoading } = useAppointments();
+  const updateStatus = useUpdateAppointmentStatus();
+
+  const grouped = (data ?? []).reduce<Record<string, typeof data>>((acc, a) => {
+    const day = new Date(a.scheduled_at).toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" });
+    (acc[day] ||= [] as never).push(a);
+    return acc;
+  }, {} as Record<string, typeof data>);
+
   return (
     <div>
       <PageHeader
-        eyebrow="May 25 – May 29, 2026"
+        eyebrow="Schedule"
         title="Appointments"
         description="Book, reschedule, and run your weekly clinic."
         actions={
-          <>
-            <div className="flex items-center border border-border rounded-lg bg-card overflow-hidden">
-              <button className="h-9 w-9 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary" aria-label="Previous week"><ChevronLeft className="size-4" /></button>
-              <div className="px-3 text-xs font-medium border-x border-border h-9 flex items-center">This week</div>
-              <button className="h-9 w-9 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary" aria-label="Next week"><ChevronRight className="size-4" /></button>
-            </div>
-            <button className="btn btn-primary"><Plus className="size-4" /> Book</button>
-          </>
+          <NewAppointmentDialog trigger={<button className="btn btn-primary"><Plus className="size-4" /> Book</button>} />
         }
       />
 
       <div className="surface">
-        <div className="grid" style={{ gridTemplateColumns: "70px repeat(5, minmax(0, 1fr))" }}>
-          <div className="border-b border-r border-border bg-secondary/40" />
-          {days.map((d) => (
-            <div key={d} className="border-b border-border bg-secondary/40 px-3 py-2.5 text-xs font-medium text-muted-foreground">
-              {d}
-            </div>
-          ))}
-
-          {hours.map((h, hi) => (
-            <Fragment key={`row-${hi}`}>
-              <div className="border-b border-r border-border px-2 py-3 text-[11px] text-muted-foreground tabular-nums text-right">
-                {h}
-              </div>
-              {days.map((_, di) => {
-                const cell = appts.find((a) => a.day === di && a.hour === hi);
-                return (
-                  <div key={`c-${hi}-${di}`} className="border-b border-border min-h-[56px] p-1 relative">
-                    {cell && (
-                      <div
-                        className={`absolute inset-x-1 top-1 rounded-md border px-2 py-1.5 text-xs leading-tight ${toneClass[cell.tone]}`}
-                        style={{ height: `calc(${cell.len * 56}px - 10px)` }}
-                      >
-                        <div className="font-medium truncate">{cell.name}</div>
-                        <div className="opacity-80 truncate">{cell.type}</div>
+        {isLoading ? (
+          <div className="p-6 space-y-3">{[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}</div>
+        ) : !data || data.length === 0 ? (
+          <EmptyState
+            icon={CalendarDays}
+            title="Nothing on the books"
+            description="Schedule your first appointment to see the clinic flow."
+            action={<NewAppointmentDialog trigger={<button className="btn btn-primary"><Plus className="size-4" /> Book appointment</button>} />}
+          />
+        ) : (
+          <div className="divide-y divide-border">
+            {Object.entries(grouped).map(([day, items]) => (
+              <div key={day}>
+                <div className="px-5 py-3 bg-secondary/40 text-xs font-medium text-muted-foreground uppercase tracking-wider sticky top-0 z-10 backdrop-blur">
+                  {day}
+                </div>
+                <ul className="divide-y divide-border">
+                  {(items ?? []).map((a, i) => (
+                    <li key={a.id} className="px-5 py-3.5 flex items-center gap-4 hover:bg-primary/[0.04] transition-colors animate-fade-in-up" style={{ animationDelay: `${i * 25}ms` }}>
+                      <div className="w-20 shrink-0 text-sm font-medium tabular-nums">
+                        {new Date(a.scheduled_at).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}
                       </div>
-                    )}
-                  </div>
-                );
-              })}
-            </Fragment>
-          ))}
-        </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium truncate">{a.patient?.name ?? "Unassigned"}</div>
+                        <div className="text-xs text-muted-foreground truncate">
+                          {a.reason ?? "—"} · {a.visit_type} · {a.duration_min} min
+                        </div>
+                      </div>
+                      <select
+                        value={a.status}
+                        onChange={(e) => updateStatus.mutate({ id: a.id, status: e.target.value })}
+                        className={`${statusTone[a.status] ?? "pill pill--neutral"} cursor-pointer border-0 outline-none`}
+                      >
+                        {statusOptions.map((s) => <option key={s} value={s}>{s}</option>)}
+                      </select>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
