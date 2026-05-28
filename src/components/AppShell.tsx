@@ -214,6 +214,16 @@ function ShortcutHelp({ onClose }: { onClose: () => void }) {
 
 function CopilotHeaderButton() {
   const { openCopilot } = useCopilot();
+
+
+
+
+
+
+
+
+
+
   return (
     <button
       onClick={() => openCopilot()}
