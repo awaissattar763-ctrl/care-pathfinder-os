@@ -6,73 +6,71 @@ import {
   Activity,
   ArrowUpRight,
   Clock,
-  Video,
   FileText,
-  Sparkles,
   Lock,
 } from "lucide-react";
 import { UrgencyBadge } from "@/components/UrgencyBadge";
 import { AIInsightCard } from "@/components/copilot/AIInsightCard";
+import { useDashboardMetrics, useAppointments, useAuditLogs } from "@/hooks/queries";
+import { NewAppointmentDialog } from "@/components/dialogs/NewAppointmentDialog";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const stats = [
-  { label: "Patients seen today", value: "28", delta: "+12%", icon: Users },
-  { label: "Upcoming appointments", value: "14", delta: "next at 2:30 PM", icon: CalendarDays },
-  { label: "Revenue this month", value: "$148,920", delta: "+8.4%", icon: Activity },
-  { label: "Open claims", value: "37", delta: "5 require attention", icon: FileText },
-];
-
-const schedule = [
-  { time: "9:00 AM", name: "Maya Chen", reason: "Follow-up — hypertension", status: "Checked in", urgency: "routine" as const },
-  { time: "9:30 AM", name: "Daniel Ortiz", reason: "Annual physical", status: "In room 3", urgency: "stable" as const },
-  { time: "10:15 AM", name: "Priya Anand", reason: "Lab review — abnormal CBC", status: "Confirmed", urgency: "urgent" as const },
-  { time: "11:00 AM", name: "Sam Whitaker", reason: "Telehealth · Migraine", status: "Telehealth", tele: true, urgency: "routine" as const },
-  { time: "1:30 PM", name: "Rosa Lin", reason: "Post-op check", status: "Confirmed", urgency: "stable" as const },
-];
-
-const activity = [
-  { icon: FileText, text: "Prescription for Maya Chen signed and sent to CVS Pharmacy." },
-  { icon: Sparkles, text: "AI symptom check flagged possible iron deficiency for new intake." },
-  { icon: Video, text: "Telehealth session with Sam W. ended — notes saved to chart." },
-  { icon: Activity, text: "Insurance claim #A‑3209 approved by Blue Shield ($420)." },
-];
-
 function Index() {
-  // Import locally to keep diff small
+  const { data: m, isLoading: metricsLoading } = useDashboardMetrics();
+  const { data: appts } = useAppointments();
+  const { data: audit } = useAuditLogs(5);
+
+  const now = new Date();
+  const startOfDay = new Date(now); startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date(startOfDay); endOfDay.setDate(endOfDay.getDate() + 1);
+  const today = (appts ?? []).filter((a) => {
+    const t = new Date(a.scheduled_at);
+    return t >= startOfDay && t < endOfDay;
+  }).slice(0, 6);
+
+  const nextTime = m?.nextAppointmentAt
+    ? new Date(m.nextAppointmentAt).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })
+    : "—";
+
+  const stats = [
+    { label: "Patients in registry", value: m?.patientsTotal ?? 0, delta: "Total", icon: Users },
+    { label: "Appointments today", value: m?.appointmentsToday ?? 0, delta: `Next at ${nextTime}`, icon: CalendarDays },
+    { label: "Revenue MTD", value: m ? `$${m.revenueMTD.toLocaleString()}` : "—", delta: "Approved claims", icon: Activity },
+    { label: "Open claims", value: m?.openClaims ?? 0, delta: "Submitted or in review", icon: FileText },
+  ];
+
   return (
     <div>
       <PageHeader
-        eyebrow="Wednesday · May 27, 2026"
-        title="Good morning, Dr. Reyes"
+        eyebrow={now.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
+        title="Good morning"
         description="Here's what's happening across your practice today."
         actions={
           <>
             <button className="btn btn-secondary">Print huddle</button>
-            <button className="btn btn-primary">New appointment <ArrowUpRight className="size-4" /></button>
+            <NewAppointmentDialog trigger={<button className="btn btn-primary">New appointment <ArrowUpRight className="size-4" /></button>} />
           </>
         }
       />
 
-      {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {stats.map((s, i) => {
           const Icon = s.icon;
           return (
-            <div
-              key={s.label}
-              className="surface p-5 lift-on-hover animate-fade-in-up"
-              style={{ animationDelay: `${i * 50}ms` }}
-            >
+            <div key={s.label} className="surface p-5 lift-on-hover animate-fade-in-up" style={{ animationDelay: `${i * 50}ms` }}>
               <div className="flex items-center justify-between">
                 <div className="label-eyebrow">{s.label}</div>
                 <div className="size-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center" aria-hidden>
                   <Icon className="size-4" aria-hidden />
                 </div>
               </div>
-              <div className="mt-3 text-[1.625rem] font-semibold tracking-tight tabular-nums">{s.value}</div>
+              <div className="mt-3 text-[1.625rem] font-semibold tracking-tight tabular-nums">
+                {metricsLoading ? <Skeleton className="h-8 w-20" /> : s.value}
+              </div>
               <div className="text-[11px] text-muted-foreground mt-1">{s.delta}</div>
             </div>
           );
@@ -80,78 +78,76 @@ function Index() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Today's schedule */}
         <div className="lg:col-span-2 surface">
           <div className="section-head">
             <div>
               <div className="section-head__title">Today's schedule</div>
-              <div className="section-head__sub">5 appointments · 1 telehealth · 2 open slots</div>
+              <div className="section-head__sub">{today.length} appointments</div>
             </div>
             <button className="btn btn-ghost btn-sm">View calendar</button>
           </div>
-          <ul className="divide-y divide-border">
-            {schedule.map((a, i) => (
-              <li
-                key={a.time}
-                className="px-5 py-3.5 flex items-center gap-4 hover:bg-primary/[0.04] transition-colors animate-fade-in-up"
-                style={{ animationDelay: `${i * 50}ms` }}
-              >
-                <div className="w-20 shrink-0 text-sm font-medium tabular-nums">{a.time}</div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium truncate">{a.name}</div>
-                  <div className="text-xs text-muted-foreground truncate" title={a.reason}>{a.reason}</div>
-                </div>
-                <UrgencyBadge level={a.urgency} />
-                <span className={a.tele ? "pill pill--info" : "pill pill--neutral"}>
-                  {a.status}
-                </span>
-                <Lock className="size-3 text-muted-foreground/60" aria-label="PHI encrypted" />
-              </li>
-            ))}
-          </ul>
+          {today.length === 0 ? (
+            <div className="px-5 py-10 text-center text-sm text-muted-foreground">No appointments scheduled for today.</div>
+          ) : (
+            <ul className="divide-y divide-border">
+              {today.map((a, i) => (
+                <li key={a.id} className="px-5 py-3.5 flex items-center gap-4 hover:bg-primary/[0.04] transition-colors animate-fade-in-up" style={{ animationDelay: `${i * 50}ms` }}>
+                  <div className="w-20 shrink-0 text-sm font-medium tabular-nums">
+                    {new Date(a.scheduled_at).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium truncate">{a.patient?.name ?? "Unassigned"}</div>
+                    <div className="text-xs text-muted-foreground truncate" title={a.reason ?? undefined}>{a.reason ?? "—"}</div>
+                  </div>
+                  <UrgencyBadge level="routine" />
+                  <span className={a.visit_type === "telehealth" ? "pill pill--info" : "pill pill--neutral"}>
+                    {a.status}
+                  </span>
+                  <Lock className="size-3 text-muted-foreground/60" aria-label="PHI encrypted" />
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         <div className="space-y-4">
           <AIInsightCard
-            title="3 charts ready for a copilot review"
-            summary="Priya Anand has an abnormal CBC trend; Maya Chen's BP is creeping above goal; Rosa Lin is due for a post-op review."
+            title="Copilot ready to assist"
+            summary="Use the Copilot to summarize charts, draft prescriptions, and triage today's inbox."
             suggestions={[
-              { label: "Summarize Priya's chart", prompt: "Summarize Priya Anand's recent labs and prior visits, highlighting the abnormal CBC trend and proposed next steps." },
-              { label: "Draft BP plan for Maya", prompt: "Draft a hypertension management update for Maya Chen, including lifestyle and medication titration options. Use SOAP." },
+              { label: "Summarize today's huddle", prompt: "Summarize today's appointments and flag the highest-priority patient encounters." },
               { label: "Triage today's inbox", prompt: "Help me triage today's appointment requests by urgency and recommend in-person vs telemedicine." },
             ]}
           />
 
-        {/* Activity */}
-        <div className="surface">
-          <div className="section-head">
-            <div>
-              <div className="section-head__title">Recent activity</div>
-              <div className="section-head__sub">Last 24 hours</div>
+          <div className="surface">
+            <div className="section-head">
+              <div>
+                <div className="section-head__title">Recent activity</div>
+                <div className="section-head__sub">Audit trail</div>
+              </div>
+            </div>
+            {!audit || audit.length === 0 ? (
+              <div className="px-5 py-10 text-center text-sm text-muted-foreground">No recent activity.</div>
+            ) : (
+              <ul className="p-3 space-y-1">
+                {audit.map((a, i) => (
+                  <li key={a.id} className="flex items-start gap-3 p-2.5 rounded-lg hover:bg-primary/[0.04] transition-colors animate-fade-in-up" style={{ animationDelay: `${i * 50}ms` }}>
+                    <div className="size-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0" aria-hidden>
+                      <Activity className="size-4" aria-hidden />
+                    </div>
+                    <div className="text-sm text-foreground/85 leading-snug capitalize">
+                      {a.action.replace(/[._]/g, " ")} <span className="text-muted-foreground">· {a.entity}</span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div className="px-5 py-3 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
+              <span className="flex items-center gap-2"><Clock className="size-3.5" aria-hidden /> Synced just now</span>
+              <a href="/compliance" className="text-primary font-medium hover:underline">Audit trail →</a>
             </div>
           </div>
-          <ul className="p-3 space-y-1">
-            {activity.map((a, i) => {
-              const Icon = a.icon;
-              return (
-                <li
-                  key={i}
-                  className="flex items-start gap-3 p-2.5 rounded-lg hover:bg-primary/[0.04] transition-colors animate-fade-in-up"
-                  style={{ animationDelay: `${i * 50}ms` }}
-                >
-                  <div className="size-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0" aria-hidden>
-                    <Icon className="size-4" aria-hidden />
-                  </div>
-                  <div className="text-sm text-foreground/85 leading-snug">{a.text}</div>
-                </li>
-              );
-            })}
-          </ul>
-          <div className="px-5 py-3 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
-            <span className="flex items-center gap-2"><Clock className="size-3.5" aria-hidden /> Synced just now</span>
-            <a href="#" className="text-primary font-medium hover:underline">Audit trail →</a>
-          </div>
-        </div>
         </div>
       </div>
     </div>
