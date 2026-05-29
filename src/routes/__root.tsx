@@ -79,10 +79,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "HealthOS is the modern practice OS for doctors and clinics: patients, scheduling, prescriptions, AI triage, claims, telemedicine." },
       { name: "author", content: "HealthOS" },
       { property: "og:title", content: "HealthOS — Medical Practice OS" },
-      { property: "og:description", content: "All-in-one platform for modern medical practices." },
+      { property: "og:description", content: "HealthOS is the modern practice OS for doctors and clinics: patients, scheduling, prescriptions, AI triage, claims, telemedicine." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "HealthOS — Medical Practice OS" },
+      { name: "twitter:description", content: "HealthOS is the modern practice OS for doctors and clinics: patients, scheduling, prescriptions, AI triage, claims, telemedicine." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/aca39870-8a59-4468-b82c-6a3bead10652" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/aca39870-8a59-4468-b82c-6a3bead10652" },
     ],
     links: [
       {
