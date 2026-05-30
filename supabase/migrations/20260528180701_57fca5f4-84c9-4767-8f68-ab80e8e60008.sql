@@ -152,7 +152,7 @@ BEGIN
   INSERT INTO public.providers (user_id, name, specialty, email)
     VALUES (
       NEW.id,
-      COALESCE(NEW.raw_user_meta_data->>'name', split_part(NEW.email, '@', 1)),
+      COALESCE(NEW.raw_user_meta_data->>'name', NULLIF(split_part(NEW.email, '@', 1), ''), 'Unknown'),
       COALESCE(NEW.raw_user_meta_data->>'specialty', 'General Medicine'),
       NEW.email
     );
