@@ -30,12 +30,30 @@ import {
   FileSignature,
   Plus,
 } from "lucide-react";
-import { UrgencyBadge } from "@/components/UrgencyBadge";
+import { UrgencyBadge, type Urgency } from "@/components/UrgencyBadge";
+import { usePatientDetails } from "@/hooks/queries";
+import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/EmptyState";
+
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/patients/$patientId")({
   component: PatientProfilePage,
 });
+
+function formatDate(d: string | null | undefined) {
+  if (!d) return "—";
+  return new Date(d).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+}
+function formatDateTime(d: string | null | undefined) {
+  if (!d) return "—";
+  return new Date(d).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" });
+}
+function calcAge(dob: string | null | undefined) {
+  if (!dob) return 0;
+  const diff = Date.now() - new Date(dob).getTime();
+  return Math.floor(diff / 3.15576e10);
+}
 
 // ----------------------------- Demo data -----------------------------
 const patient = {
@@ -237,6 +255,98 @@ function TrendIcon({ trend }: { trend: string }) {
 // ----------------------------- Page -----------------------------
 
 function PatientProfilePage() {
+  const { patientId } = Route.useParams();
+  const { data, isLoading } = usePatientDetails(patientId);
+
+  if (isLoading) {
+    return (
+      <div className="p-8 space-y-6">
+        <Skeleton className="h-4 w-32" />
+        <div className="flex items-start gap-6">
+          <Skeleton className="size-20 rounded-2xl" />
+          <Skeleton className="h-24 flex-1" />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-6">
+          <Skeleton className="h-64 hidden lg:block" />
+          <div className="space-y-6">
+            <Skeleton className="h-48" />
+            <Skeleton className="h-64" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!data || !data.patient) {
+    return (
+      <div className="p-8">
+        <EmptyState icon={User2} title="Patient not found" description="The requested patient record could not be found." />
+      </div>
+    );
+  }
+
+    const p = data.patient;
+  const patient = {
+    id: p.id,
+    name: p.name,
+    pronouns: p.sex === 'Male' ? 'he/him' : p.sex === 'Female' ? 'she/her' : 'they/them',
+    dob: p.dob || "",
+    age: calcAge(p.dob),
+    sex: p.sex || "",
+    bloodGroup: p.blood_group || "—",
+    mrn: p.mrn,
+    primaryCare: p.primary_care?.name || "Unassigned",
+    insurance: ((p.insurance as any) || { provider: "Unknown", policy: "—", group: "—", validThrough: "—" }),
+    contact: { phone: p.phone || "—", email: p.email || "—", address: p.address || "—" },
+    emergency: ((p.emergency_contact as any) || { name: "None", relation: "—", phone: "—" }),
+    flags: p.flags || [],
+    riskScore: p.risk_score || 0,
+    urgency: p.urgency
+  };
+
+  const conditions = (p.conditions || []).map((c: any) => ({
+    name: c, code: "—", since: "—", status: "Active"
+  }));
+
+  const allergies = data.allergies.map((a: any) => ({
+    name: a.name, allergen: a.name, reaction: a.reaction || "—", severity: a.severity || "mild"
+  }));
+
+  const vitals = data.vitals.map((v: any) => ({
+    label: v.label, value: v.value, unit: v.unit, trend: v.trend as any, measuredAt: formatDate(v.measured_at), series: (v.series as number[]) || [60,65,62]
+  }));
+
+  const timeline = [
+    ...data.appointments.map((a: any) => ({ date: a.scheduled_at, type: "Visit", title: a.visit_type, by: a.provider?.name || "Unknown", note: a.reason || a.notes || "" })),
+    ...data.documents.map((d: any) => ({ date: d.uploaded_at, type: d.modality || "Document", title: d.name, by: "System", note: `Size: ${d.size || "Unknown"}` })),
+    ...data.soapNotes.map((n: any) => ({ date: n.created_at, type: "Note", title: "SOAP Note", by: n.author, note: n.a || "" })),
+    ...data.prescriptions.map((pr: any) => ({ date: pr.created_at, type: "Prescription", title: pr.drug, by: pr.provider?.name || "Unknown", note: pr.sig }))
+  ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+   .map((t: any) => ({ ...t, date: formatDate(t.date) }))
+   .slice(0, 10);
+
+  const soapNotes = data.soapNotes.map((n: any) => ({
+    date: formatDate(n.date), author: n.author, s: n.s || "", o: n.o || "", a: n.a || "", p: n.p || ""
+  }));
+
+  const medications = data.prescriptions.map((pr: any) => ({
+    rx: pr.rx_number, name: pr.drug, dose: pr.sig, freq: "—", route: "—", started: formatDate(pr.created_at), prescriber: pr.provider?.name || "Unknown", status: pr.status || "Active", refills: 0
+  }));
+
+  const auditTrail = data.auditLogs.map((al: any) => ({
+    date: formatDateTime(al.created_at), when: formatDateTime(al.created_at), action: al.action, user: "System/User", who: "System/User", role: "System", details: JSON.stringify(al.metadata)
+  }));
+
+  const docs = data.documents;
+  const labs = docs.filter((d: any) => d.modality?.toLowerCase().includes("lab") || d.modality?.toLowerCase().includes("blood")).map((d: any) => ({
+    date: formatDate(d.date), test: d.name, result: "View", flag: "", trend: "stable", name: d.name, flagged: false, status: "Final", size: "1 MB"
+  }));
+  const scans = docs.filter((d: any) => !d.modality?.toLowerCase().includes("lab") && !d.modality?.toLowerCase().includes("blood")).map((d: any) => ({
+    date: formatDate(d.date), modality: d.modality || "Scan", bodyPart: d.name, finding: "View report", name: d.name, size: "5 MB"
+  }));
+  const aiSummary = (p.ai_summary as any) || { overview: `Patient ${p.name}.`, recommendations: [] };
+
+
   const initials = patient.name.split(" ").map((n) => n[0]).join("");
 
   return (
@@ -268,7 +378,7 @@ function PatientProfilePage() {
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-3xl font-bold tracking-tight text-foreground">{patient.name}</h1>
               <span className="text-sm text-muted-foreground">({patient.pronouns})</span>
-              <UrgencyBadge level="routine">Stable</UrgencyBadge>
+              <UrgencyBadge level={(patient.urgency as Urgency) || "routine"}>Stable</UrgencyBadge>
             </div>
             <div className="mt-2 flex flex-wrap gap-x-6 gap-y-1.5 text-sm text-muted-foreground">
               <span><span className="text-foreground font-medium">{patient.age}</span> yrs · {patient.sex}</span>

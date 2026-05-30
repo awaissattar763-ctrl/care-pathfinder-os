@@ -12,6 +12,11 @@ export type Prescription = Database["public"]["Tables"]["prescriptions"]["Row"];
 export type PrescriptionInsert = Database["public"]["Tables"]["prescriptions"]["Insert"];
 export type Claim = Database["public"]["Tables"]["claims"]["Row"];
 export type AuditLog = Database["public"]["Tables"]["audit_logs"]["Row"];
+export type Provider = Database["public"]["Tables"]["providers"]["Row"];
+export type Allergy = Database["public"]["Tables"]["allergies"]["Row"];
+export type Vital = Database["public"]["Tables"]["vitals"]["Row"];
+export type Document = Database["public"]["Tables"]["documents"]["Row"];
+export type SoapNote = Database["public"]["Tables"]["soap_notes"]["Row"];
 
 /* ---------------- Patients ---------------- */
 
@@ -40,6 +45,55 @@ export function usePatient(id: string | undefined) {
       if (error) throw error;
       return data as Patient | null;
     },
+  });
+}
+
+export function usePatientDetails(id: string | undefined) {
+  return useQuery({
+    queryKey: ["patient_details", id],
+    enabled: !!id,
+    queryFn: async () => {
+      if (!id) throw new Error("No ID");
+      const [
+        { data: patient, error: patientErr },
+        { data: allergies, error: allergiesErr },
+        { data: vitals, error: vitalsErr },
+        { data: documents, error: docsErr },
+        { data: soapNotes, error: soapErr },
+        { data: appointments, error: apptErr },
+        { data: prescriptions, error: rxErr },
+        { data: auditLogs, error: auditErr },
+      ] = await Promise.all([
+        supabase.from("patients").select("*, primary_care:providers(*)").eq("id", id).single(),
+        supabase.from("allergies").select("*").eq("patient_id", id),
+        supabase.from("vitals").select("*").eq("patient_id", id).order("measured_at", { ascending: false }),
+        supabase.from("documents").select("*").eq("patient_id", id).order("uploaded_at", { ascending: false }),
+        supabase.from("soap_notes").select("*").eq("patient_id", id).order("date", { ascending: false }),
+        supabase.from("appointments").select("*, provider:providers(*)").eq("patient_id", id).order("scheduled_at", { ascending: false }),
+        supabase.from("prescriptions").select("*, provider:providers(*)").eq("patient_id", id).order("created_at", { ascending: false }),
+        supabase.from("audit_logs").select("*").eq("entity_id", id).order("created_at", { ascending: false }).limit(20)
+      ]);
+
+      if (patientErr) throw patientErr;
+      if (allergiesErr) throw allergiesErr;
+      if (vitalsErr) throw vitalsErr;
+      if (docsErr) throw docsErr;
+      if (soapErr) throw soapErr;
+      if (apptErr) throw apptErr;
+      if (rxErr) throw rxErr;
+      if (auditErr) throw auditErr;
+
+      return {
+        patient: patient as Patient & { primary_care: Provider | null },
+        allergies: allergies as Allergy[],
+        vitals: vitals as Vital[],
+        documents: documents as Document[],
+        soapNotes: soapNotes as SoapNote[],
+        appointments: appointments as (Appointment & { provider: Provider | null })[],
+        prescriptions: prescriptions as (Prescription & { provider: Provider | null })[],
+        auditLogs: auditLogs as AuditLog[]
+      };
+    }
   });
 }
 
