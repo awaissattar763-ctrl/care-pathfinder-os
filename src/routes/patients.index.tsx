@@ -8,7 +8,7 @@ import { NewPatientDialog } from "@/components/dialogs/NewPatientDialog";
 import { EmptyState } from "@/components/EmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export const Route = createFileRoute("/patients")({ component: PatientsPage });
+export const Route = createFileRoute("/patients/")({ component: PatientsPage });
 
 function formatDate(d: string | null) {
   if (!d) return "—";
