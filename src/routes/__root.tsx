@@ -12,6 +12,7 @@ import appCss from "../styles.css?url";
 import { AppShell } from "@/components/AppShell";
 import { AuthProvider } from "@/hooks/use-auth";
 import { AuthGate } from "@/components/AuthGate";
+import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -124,6 +125,7 @@ function RootComponent() {
         <AuthGate>
           <AppShell />
         </AuthGate>
+        <Toaster richColors closeButton position="bottom-right" />
       </AuthProvider>
     </QueryClientProvider>
   );

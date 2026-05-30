@@ -1,6 +1,6 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Toaster } from "@/components/ui/sonner";
+
 import { useAuth } from "@/hooks/use-auth";
 import { LogOut } from "lucide-react";
 import {
@@ -166,7 +166,7 @@ export function AppShell() {
       </div>
       <CopilotLauncher />
       <AICopilot />
-      <Toaster richColors closeButton position="bottom-right" />
+
       {showHelp && <ShortcutHelp onClose={() => setShowHelp(false)} />}
     </div>
     </CopilotProvider>
