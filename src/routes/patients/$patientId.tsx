@@ -255,6 +255,7 @@ function TrendIcon({ trend }: { trend: string }) {
 // ----------------------------- Page -----------------------------
 
 function PatientProfilePage() {
+  console.log('PATIENT DETAIL MOUNTED');
   const { patientId } = Route.useParams();
   const { data, isLoading } = usePatientDetails(patientId);
 
