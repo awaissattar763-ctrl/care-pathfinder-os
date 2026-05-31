@@ -139,6 +139,9 @@ export function AppShell() {
               >
                 <span className="status-dot status-dot--live" aria-hidden /> HIPAA secure session
               </div>
+              <div className="flex items-center px-3 h-9 rounded-lg bg-red-500/10 text-red-600 text-xs font-bold tracking-wider">
+                BUILD VERSION: 93b094e
+              </div>
             </div>
           </header>
           <div key={pathname} className="p-7 flex-1 animate-fade-in-up">
