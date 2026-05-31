@@ -17,8 +17,8 @@ import { Route as ClaimsRouteImport } from './routes/claims'
 import { Route as AppointmentsRouteImport } from './routes/appointments'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as PatientsIndexRouteImport } from './routes/patients/index'
-import { Route as PatientsPatientIdRouteImport } from './routes/patients/$patientId'
+import { Route as PatientsIndexRouteImport } from './routes/patients.index'
+import { Route as PatientsPatientIdRouteImport } from './routes/patients.$patientId'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 
 const TelemedicineRoute = TelemedicineRouteImport.update({

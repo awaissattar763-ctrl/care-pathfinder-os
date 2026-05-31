@@ -142,6 +142,9 @@ export function AppShell() {
             </div>
           </header>
           <div key={pathname} className="p-7 flex-1 animate-fade-in-up">
+            <div className="bg-red-500 text-white p-2 font-bold mb-4">
+              CURRENT ROUTE = {pathname}
+            </div>
             <Outlet />
           </div>
           <footer className="border-t border-border px-7 py-4 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
