@@ -255,13 +255,14 @@ function TrendIcon({ trend }: { trend: string }) {
 // ----------------------------- Page -----------------------------
 
 function PatientProfilePage() {
-  console.log('PATIENT DETAIL MOUNTED');
+  console.log('PATIENT DETAIL PAGE MOUNTED');
   const { patientId } = Route.useParams();
   const { data, isLoading } = usePatientDetails(patientId);
 
   if (isLoading) {
     return (
       <div className="p-8 space-y-6">
+        <div style={{ background: 'red', color: 'white', padding: '10px' }}>PATIENT DETAIL PAGE MOUNTED</div>
         <Skeleton className="h-4 w-32" />
         <div className="flex items-start gap-6">
           <Skeleton className="size-20 rounded-2xl" />
@@ -352,6 +353,7 @@ function PatientProfilePage() {
 
   return (
     <div className="animate-fade-in-up">
+      <div style={{ background: 'red', color: 'white', padding: '10px' }}>PATIENT DETAIL PAGE MOUNTED</div>
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-xs text-muted-foreground mb-4">
         <Link to="/patients" className="inline-flex items-center gap-1 hover:text-primary">
