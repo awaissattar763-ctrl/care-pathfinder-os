@@ -52,6 +52,7 @@ export function usePatientDetails(id: string | undefined) {
   return useQuery({
     queryKey: ["patient_details", id],
     enabled: !!id,
+    retry: false,
     queryFn: async () => {
       if (!id) throw new Error("No ID");
       const [
