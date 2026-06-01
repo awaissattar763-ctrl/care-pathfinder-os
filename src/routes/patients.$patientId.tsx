@@ -255,30 +255,12 @@ function TrendIcon({ trend }: { trend: string }) {
 // ----------------------------- Page -----------------------------
 
 function PatientProfilePage() {
-  console.log('PATIENT DETAIL PAGE MOUNTED');
   const { patientId } = Route.useParams();
-  const { data, isLoading, error, isFetching, status, fetchStatus, isPending, isError } = usePatientDetails(patientId);
-
-  const debugPanel = (
-    <div className="bg-yellow-100 border border-yellow-400 text-yellow-900 p-4 mb-6 rounded-md font-mono text-sm relative z-50">
-      <div className="font-bold mb-2">DEBUG PANEL</div>
-      <div>patientId: {patientId}</div>
-      <div>status: {status}</div>
-      <div>fetchStatus: {fetchStatus}</div>
-      <div>isLoading: {isLoading ? 'true' : 'false'}</div>
-      <div>isFetching: {isFetching ? 'true' : 'false'}</div>
-      <div>isPending: {isPending ? 'true' : 'false'}</div>
-      <div>isError: {isError ? 'true' : 'false'}</div>
-      <div>error?.message: {error instanceof Error ? error.message : String(error || 'none')}</div>
-      <div>Boolean(data): {data ? 'true' : 'false'}</div>
-    </div>
-  );
+  const { data, isLoading } = usePatientDetails(patientId);
 
   if (isLoading) {
     return (
       <div className="p-8 space-y-6">
-        {debugPanel}
-        <div style={{ background: 'red', color: 'white', padding: '10px' }}>PATIENT DETAIL PAGE MOUNTED</div>
         <Skeleton className="h-4 w-32" />
         <div className="flex items-start gap-6">
           <Skeleton className="size-20 rounded-2xl" />
@@ -298,7 +280,6 @@ function PatientProfilePage() {
   if (!data || !data.patient) {
     return (
       <div className="p-8">
-        {debugPanel}
         <EmptyState icon={User2} title="Patient not found" description="The requested patient record could not be found." />
       </div>
     );
@@ -370,8 +351,6 @@ function PatientProfilePage() {
 
   return (
     <div className="animate-fade-in-up">
-      {debugPanel}
-      <div style={{ background: 'red', color: 'white', padding: '10px' }}>PATIENT DETAIL PAGE MOUNTED</div>
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-xs text-muted-foreground mb-4">
         <Link to="/patients" className="inline-flex items-center gap-1 hover:text-primary">
@@ -432,7 +411,7 @@ function PatientProfilePage() {
           <span className="inline-flex items-center gap-1.5"><MapPin className="size-3.5" /> {patient.contact.address}</span>
           <span className="inline-flex items-center gap-1.5"><Clock className="size-3.5" /> Last updated 4 min ago</span>
           <span className="inline-flex items-center gap-1.5"><ShieldCheck className="size-3.5 text-success" /> HIPAA-compliant access</span>
-          {patient.flags.map((f) => (
+          {patient.flags.map((f: string) => (
             <span key={f} className="inline-flex items-center gap-1.5 text-foreground/70">
               <span className="size-1.5 rounded-full bg-primary" /> {f}
             </span>
