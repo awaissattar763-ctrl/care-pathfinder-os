@@ -147,11 +147,84 @@ export function useAppointments() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("appointments")
-        .select("*, patient:patients(id,name,mrn)")
+        .select("*, patient:patients(id,name,mrn,phone,email,urgency), provider:providers(id,name,specialty)")
         .order("scheduled_at", { ascending: true });
       if (error) throw error;
-      return data as (Appointment & { patient: Pick<Patient, "id" | "name" | "mrn"> | null })[];
+      return data as AppointmentWithRefs[];
     },
+  });
+}
+
+export type AppointmentWithRefs = Appointment & {
+  patient: Pick<Patient, "id" | "name" | "mrn" | "phone" | "email" | "urgency"> | null;
+  provider: Pick<Provider, "id" | "name" | "specialty"> | null;
+};
+
+export function useProviders() {
+  return useQuery({
+    queryKey: ["providers"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("providers").select("*").order("name");
+      if (error) throw error;
+      return data as Provider[];
+    },
+  });
+}
+
+export function useUpdateAppointment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...patch }: Partial<Appointment> & { id: string }) => {
+      const { data, error } = await supabase
+        .from("appointments")
+        .update(patch)
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) throw error;
+      await logAudit("appointment.update", "appointment", id, patch as Record<string, unknown>);
+      return data;
+    },
+    onMutate: async ({ id, ...patch }) => {
+      await qc.cancelQueries({ queryKey: ["appointments"] });
+      const prev = qc.getQueryData<AppointmentWithRefs[]>(["appointments"]);
+      qc.setQueryData<AppointmentWithRefs[]>(["appointments"], (old) =>
+        old?.map((a) => (a.id === id ? { ...a, ...patch } as AppointmentWithRefs : a)) ?? old,
+      );
+      return { prev };
+    },
+    onError: (e, _v, ctx) => {
+      if (ctx?.prev) qc.setQueryData(["appointments"], ctx.prev);
+      toast.error(e instanceof Error ? e.message : "Could not update appointment");
+    },
+    onSuccess: () => toast.success("Appointment updated"),
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: ["appointments"] });
+      qc.invalidateQueries({ queryKey: ["dashboard"] });
+    },
+  });
+}
+
+export function useCancelAppointment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, reason }: { id: string; reason?: string }) => {
+      const { data, error } = await supabase
+        .from("appointments")
+        .update({ status: "cancelled", notes: reason ?? null })
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) throw error;
+      await logAudit("appointment.cancel", "appointment", id, { reason });
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["appointments"] });
+      qc.invalidateQueries({ queryKey: ["dashboard"] });
+      toast.success("Appointment cancelled");
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Cancel failed"),
   });
 }
 
