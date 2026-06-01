@@ -1,22 +1,46 @@
-import { useState, type ReactNode, type FormEvent } from "react";
+import { useEffect, useState, type ReactNode, type FormEvent } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { useCreateAppointment, usePatients } from "@/hooks/queries";
+import { useCreateAppointment, usePatients, useProviders } from "@/hooks/queries";
 import { Loader2 } from "lucide-react";
 
-export function NewAppointmentDialog({ trigger }: { trigger: ReactNode }) {
-  const [open, setOpen] = useState(false);
+export function NewAppointmentDialog({
+  trigger,
+  initialDate,
+  open: controlledOpen,
+  onOpenChange,
+}: {
+  trigger?: ReactNode;
+  initialDate?: Date;
+  open?: boolean;
+  onOpenChange?: (o: boolean) => void;
+}) {
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+  const open = controlledOpen ?? uncontrolledOpen;
+  const setOpen = onOpenChange ?? setUncontrolledOpen;
   const { data: patients } = usePatients();
+  const { data: providers } = useProviders();
   const [patientId, setPatientId] = useState("");
+  const [providerId, setProviderId] = useState("");
   const [scheduledAt, setScheduledAt] = useState("");
   const [duration, setDuration] = useState(30);
   const [reason, setReason] = useState("");
   const [visitType, setVisitType] = useState("in-person");
   const create = useCreateAppointment();
 
+  useEffect(() => {
+    if (open && initialDate) {
+      // format as datetime-local in local TZ
+      const d = new Date(initialDate);
+      const pad = (n: number) => String(n).padStart(2, "0");
+      setScheduledAt(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`);
+    }
+  }, [open, initialDate]);
+
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     await create.mutateAsync({
       patient_id: patientId,
+      provider_id: providerId || null,
       scheduled_at: new Date(scheduledAt).toISOString(),
       duration_min: duration,
       reason,
@@ -30,7 +54,7 @@ export function NewAppointmentDialog({ trigger }: { trigger: ReactNode }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>New appointment</DialogTitle>
@@ -42,6 +66,15 @@ export function NewAppointmentDialog({ trigger }: { trigger: ReactNode }) {
               <option value="">Select patient…</option>
               {patients?.map((p) => (
                 <option key={p.id} value={p.id}>{p.name} · {p.mrn}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="text-xs font-medium text-foreground/80">Provider</label>
+            <select className={field} value={providerId} onChange={(e) => setProviderId(e.target.value)}>
+              <option value="">Unassigned</option>
+              {providers?.map((p) => (
+                <option key={p.id} value={p.id}>{p.name}{p.specialty ? ` · ${p.specialty}` : ""}</option>
               ))}
             </select>
           </div>
