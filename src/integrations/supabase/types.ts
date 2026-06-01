@@ -16,28 +16,28 @@ export type Database = {
     Tables: {
       allergies: {
         Row: {
-          id: string
-          patient_id: string
-          name: string
-          reaction: string | null
-          severity: string | null
           created_at: string
+          id: string
+          name: string
+          patient_id: string
+          reaction: string | null
+          severity: string
         }
         Insert: {
-          id?: string
-          patient_id: string
-          name: string
-          reaction?: string | null
-          severity?: string | null
           created_at?: string
+          id?: string
+          name: string
+          patient_id: string
+          reaction?: string | null
+          severity?: string
         }
         Update: {
-          id?: string
-          patient_id?: string
-          name?: string
-          reaction?: string | null
-          severity?: string | null
           created_at?: string
+          id?: string
+          name?: string
+          patient_id?: string
+          reaction?: string | null
+          severity?: string
         }
         Relationships: [
           {
@@ -46,7 +46,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "patients"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       appointments: {
@@ -176,33 +176,30 @@ export type Database = {
       }
       documents: {
         Row: {
-          id: string
-          patient_id: string
-          name: string
-          modality: string | null
           date: string | null
+          id: string
+          modality: string | null
+          name: string
+          patient_id: string
           size: string | null
-          storage_path: string | null
           uploaded_at: string
         }
         Insert: {
-          id?: string
-          patient_id: string
-          name: string
-          modality?: string | null
           date?: string | null
+          id?: string
+          modality?: string | null
+          name: string
+          patient_id: string
           size?: string | null
-          storage_path?: string | null
           uploaded_at?: string
         }
         Update: {
-          id?: string
-          patient_id?: string
-          name?: string
-          modality?: string | null
           date?: string | null
+          id?: string
+          modality?: string | null
+          name?: string
+          patient_id?: string
           size?: string | null
-          storage_path?: string | null
           uploaded_at?: string
         }
         Relationships: [
@@ -212,7 +209,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "patients"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       patients: {
@@ -233,8 +230,8 @@ export type Database = {
           mrn: string
           name: string
           phone: string | null
-          primary_care_provider_id: string | null
-          risk_score: number | null
+          primary_care_id: string | null
+          risk_score: number
           sex: string | null
           updated_at: string
           urgency: string
@@ -256,8 +253,8 @@ export type Database = {
           mrn: string
           name: string
           phone?: string | null
-          primary_care_provider_id?: string | null
-          risk_score?: number | null
+          primary_care_id?: string | null
+          risk_score?: number
           sex?: string | null
           updated_at?: string
           urgency?: string
@@ -279,20 +276,20 @@ export type Database = {
           mrn?: string
           name?: string
           phone?: string | null
-          primary_care_provider_id?: string | null
-          risk_score?: number | null
+          primary_care_id?: string | null
+          risk_score?: number
           sex?: string | null
           updated_at?: string
           urgency?: string
         }
         Relationships: [
           {
-            foreignKeyName: "patients_primary_care_provider_id_fkey"
-            columns: ["primary_care_provider_id"]
+            foreignKeyName: "patients_primary_care_id_fkey"
+            columns: ["primary_care_id"]
             isOneToOne: false
             referencedRelation: "providers"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       prescriptions: {
@@ -384,37 +381,37 @@ export type Database = {
       }
       soap_notes: {
         Row: {
-          id: string
-          patient_id: string
-          author: string
-          s: string | null
-          o: string | null
           a: string | null
-          p: string | null
-          date: string | null
+          author: string
           created_at: string
+          date: string
+          id: string
+          o: string | null
+          p: string | null
+          patient_id: string
+          s: string | null
         }
         Insert: {
-          id?: string
-          patient_id: string
-          author: string
-          s?: string | null
-          o?: string | null
           a?: string | null
-          p?: string | null
-          date?: string | null
+          author: string
           created_at?: string
+          date?: string
+          id?: string
+          o?: string | null
+          p?: string | null
+          patient_id: string
+          s?: string | null
         }
         Update: {
-          id?: string
-          patient_id?: string
-          author?: string
-          s?: string | null
-          o?: string | null
           a?: string | null
-          p?: string | null
-          date?: string | null
+          author?: string
           created_at?: string
+          date?: string
+          id?: string
+          o?: string | null
+          p?: string | null
+          patient_id?: string
+          s?: string | null
         }
         Relationships: [
           {
@@ -423,7 +420,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "patients"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       user_roles: {
@@ -449,34 +446,37 @@ export type Database = {
       }
       vitals: {
         Row: {
+          created_at: string
           id: string
-          patient_id: string
           label: string
-          value: string
-          unit: string
-          trend: string | null
-          series: Json | null
           measured_at: string
+          patient_id: string
+          series: Json | null
+          trend: string | null
+          unit: string | null
+          value: string
         }
         Insert: {
+          created_at?: string
           id?: string
-          patient_id: string
           label: string
-          value: string
-          unit: string
-          trend?: string | null
-          series?: Json | null
           measured_at?: string
+          patient_id: string
+          series?: Json | null
+          trend?: string | null
+          unit?: string | null
+          value: string
         }
         Update: {
+          created_at?: string
           id?: string
-          patient_id?: string
           label?: string
-          value?: string
-          unit?: string
-          trend?: string | null
-          series?: Json | null
           measured_at?: string
+          patient_id?: string
+          series?: Json | null
+          trend?: string | null
+          unit?: string | null
+          value?: string
         }
         Relationships: [
           {
@@ -485,7 +485,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "patients"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
     }

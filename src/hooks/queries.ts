@@ -65,7 +65,7 @@ export function usePatientDetails(id: string | undefined) {
         { data: prescriptions, error: rxErr },
         { data: auditLogs, error: auditErr },
       ] = await Promise.all([
-        supabase.from("patients").select("*, primary_care:providers(*)").eq("id", id).single(),
+        supabase.from("patients").select("*, primary_care:providers!patients_primary_care_id_fkey(*)").eq("id", id).single(),
         supabase.from("allergies").select("*").eq("patient_id", id),
         supabase.from("vitals").select("*").eq("patient_id", id).order("measured_at", { ascending: false }),
         supabase.from("documents").select("*").eq("patient_id", id).order("uploaded_at", { ascending: false }),
