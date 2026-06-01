@@ -147,11 +147,84 @@ export function useAppointments() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("appointments")
-        .select("*, patient:patients(id,name,mrn)")
+        .select("*, patient:patients(id,name,mrn,phone,email,urgency), provider:providers(id,name,specialty)")
         .order("scheduled_at", { ascending: true });
       if (error) throw error;
-      return data as (Appointment & { patient: Pick<Patient, "id" | "name" | "mrn"> | null })[];
+      return data as AppointmentWithRefs[];
     },
+  });
+}
+
+export type AppointmentWithRefs = Appointment & {
+  patient: Pick<Patient, "id" | "name" | "mrn" | "phone" | "email" | "urgency"> | null;
+  provider: Pick<Provider, "id" | "name" | "specialty"> | null;
+};
+
+export function useProviders() {
+  return useQuery({
+    queryKey: ["providers"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("providers").select("*").order("name");
+      if (error) throw error;
+      return data as Provider[];
+    },
+  });
+}
+
+export function useUpdateAppointment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...patch }: Partial<Appointment> & { id: string }) => {
+      const { data, error } = await supabase
+        .from("appointments")
+        .update(patch)
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) throw error;
+      await logAudit("appointment.update", "appointment", id, patch as Record<string, unknown>);
+      return data;
+    },
+    onMutate: async ({ id, ...patch }) => {
+      await qc.cancelQueries({ queryKey: ["appointments"] });
+      const prev = qc.getQueryData<AppointmentWithRefs[]>(["appointments"]);
+      qc.setQueryData<AppointmentWithRefs[]>(["appointments"], (old) =>
+        old?.map((a) => (a.id === id ? { ...a, ...patch } as AppointmentWithRefs : a)) ?? old,
+      );
+      return { prev };
+    },
+    onError: (e, _v, ctx) => {
+      if (ctx?.prev) qc.setQueryData(["appointments"], ctx.prev);
+      toast.error(e instanceof Error ? e.message : "Could not update appointment");
+    },
+    onSuccess: () => toast.success("Appointment updated"),
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: ["appointments"] });
+      qc.invalidateQueries({ queryKey: ["dashboard"] });
+    },
+  });
+}
+
+export function useCancelAppointment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, reason }: { id: string; reason?: string }) => {
+      const { data, error } = await supabase
+        .from("appointments")
+        .update({ status: "cancelled", notes: reason ?? null })
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) throw error;
+      await logAudit("appointment.cancel", "appointment", id, { reason });
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["appointments"] });
+      qc.invalidateQueries({ queryKey: ["dashboard"] });
+      toast.success("Appointment cancelled");
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Cancel failed"),
   });
 }
 
@@ -311,7 +384,7 @@ export function useDashboardMetrics() {
       endOfDay.setDate(endOfDay.getDate() + 1);
       const startOfMonth = new Date(startOfDay.getFullYear(), startOfDay.getMonth(), 1);
 
-      const [patientsCount, todayAppts, monthClaims, openClaims, upcoming] = await Promise.all([
+      const [patientsCount, todayAppts, monthClaims, openClaims, upcoming, weekAppts, missed] = await Promise.all([
         supabase.from("patients").select("id", { count: "exact", head: true }),
         supabase
           .from("appointments")
@@ -332,6 +405,16 @@ export function useDashboardMetrics() {
           .gte("scheduled_at", new Date().toISOString())
           .order("scheduled_at", { ascending: true })
           .limit(1),
+        supabase
+          .from("appointments")
+          .select("status,duration_min")
+          .gte("scheduled_at", new Date(startOfDay.getTime() - 6 * 24 * 3600 * 1000).toISOString())
+          .lt("scheduled_at", endOfDay.toISOString()),
+        supabase
+          .from("appointments")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "no-show")
+          .gte("scheduled_at", new Date(startOfDay.getTime() - 30 * 24 * 3600 * 1000).toISOString()),
       ]);
 
       const revenueMTD = (monthClaims.data ?? [])
@@ -339,12 +422,18 @@ export function useDashboardMetrics() {
         .reduce((sum, c) => sum + Number(c.amount || 0), 0);
       const nextAppt = upcoming.data?.[0]?.scheduled_at ?? null;
 
+      const weekRows = weekAppts.data ?? [];
+      const completed = weekRows.filter((a) => a.status === "completed").length;
+      const utilization = weekRows.length ? Math.round((completed / weekRows.length) * 100) : 0;
+
       return {
         patientsTotal: patientsCount.count ?? 0,
         appointmentsToday: todayAppts.count ?? 0,
         revenueMTD,
         openClaims: openClaims.count ?? 0,
         nextAppointmentAt: nextAppt,
+        missed30d: missed.count ?? 0,
+        utilization7d: utilization,
       };
     },
   });

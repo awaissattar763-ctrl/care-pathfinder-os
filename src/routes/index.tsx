@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHeader } from "@/components/PageHeader";
 import {
   Users,
@@ -8,6 +8,8 @@ import {
   Clock,
   FileText,
   Lock,
+  AlertTriangle,
+  Gauge,
 } from "lucide-react";
 import { UrgencyBadge } from "@/components/UrgencyBadge";
 import { AIInsightCard } from "@/components/copilot/AIInsightCard";
@@ -39,6 +41,8 @@ function Index() {
   const stats = [
     { label: "Patients in registry", value: m?.patientsTotal ?? 0, delta: "Total", icon: Users },
     { label: "Appointments today", value: m?.appointmentsToday ?? 0, delta: `Next at ${nextTime}`, icon: CalendarDays },
+    { label: "Utilization (7d)", value: m ? `${m.utilization7d}%` : "—", delta: "Completed vs scheduled", icon: Gauge },
+    { label: "Missed (30d)", value: m?.missed30d ?? 0, delta: "No-show appointments", icon: AlertTriangle },
     { label: "Revenue MTD", value: m ? `$${m.revenueMTD.toLocaleString()}` : "—", delta: "Approved claims", icon: Activity },
     { label: "Open claims", value: m?.openClaims ?? 0, delta: "Submitted or in review", icon: FileText },
   ];
@@ -57,7 +61,7 @@ function Index() {
         }
       />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
         {stats.map((s, i) => {
           const Icon = s.icon;
           return (
@@ -84,7 +88,7 @@ function Index() {
               <div className="section-head__title">Today's schedule</div>
               <div className="section-head__sub">{today.length} appointments</div>
             </div>
-            <button className="btn btn-ghost btn-sm">View calendar</button>
+            <Link to="/appointments" className="btn btn-ghost btn-sm">View calendar</Link>
           </div>
           {today.length === 0 ? (
             <div className="px-5 py-10 text-center text-sm text-muted-foreground">No appointments scheduled for today.</div>
