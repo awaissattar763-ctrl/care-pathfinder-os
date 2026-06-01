@@ -384,7 +384,7 @@ export function useDashboardMetrics() {
       endOfDay.setDate(endOfDay.getDate() + 1);
       const startOfMonth = new Date(startOfDay.getFullYear(), startOfDay.getMonth(), 1);
 
-      const [patientsCount, todayAppts, monthClaims, openClaims, upcoming] = await Promise.all([
+      const [patientsCount, todayAppts, monthClaims, openClaims, upcoming, weekAppts, missed] = await Promise.all([
         supabase.from("patients").select("id", { count: "exact", head: true }),
         supabase
           .from("appointments")
@@ -405,6 +405,16 @@ export function useDashboardMetrics() {
           .gte("scheduled_at", new Date().toISOString())
           .order("scheduled_at", { ascending: true })
           .limit(1),
+        supabase
+          .from("appointments")
+          .select("status,duration_min")
+          .gte("scheduled_at", new Date(startOfDay.getTime() - 6 * 24 * 3600 * 1000).toISOString())
+          .lt("scheduled_at", endOfDay.toISOString()),
+        supabase
+          .from("appointments")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "no-show")
+          .gte("scheduled_at", new Date(startOfDay.getTime() - 30 * 24 * 3600 * 1000).toISOString()),
       ]);
 
       const revenueMTD = (monthClaims.data ?? [])
@@ -412,12 +422,18 @@ export function useDashboardMetrics() {
         .reduce((sum, c) => sum + Number(c.amount || 0), 0);
       const nextAppt = upcoming.data?.[0]?.scheduled_at ?? null;
 
+      const weekRows = weekAppts.data ?? [];
+      const completed = weekRows.filter((a) => a.status === "completed").length;
+      const utilization = weekRows.length ? Math.round((completed / weekRows.length) * 100) : 0;
+
       return {
         patientsTotal: patientsCount.count ?? 0,
         appointmentsToday: todayAppts.count ?? 0,
         revenueMTD,
         openClaims: openClaims.count ?? 0,
         nextAppointmentAt: nextAppt,
+        missed30d: missed.count ?? 0,
+        utilization7d: utilization,
       };
     },
   });
