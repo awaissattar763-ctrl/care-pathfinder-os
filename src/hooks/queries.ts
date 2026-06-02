@@ -152,7 +152,7 @@ export function useAppointments() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("appointments")
-        .select("*, patient:patients(id,name,mrn,phone,email,urgency), provider:providers(id,name,specialty), room:rooms(id,name,color)")
+        .select("*, patient:patients(id,name,mrn,phone,email,urgency), provider:providers(id,name,specialty)")
         .order("scheduled_at", { ascending: true });
       if (error) throw error;
       return data as AppointmentWithRefs[];
