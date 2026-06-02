@@ -405,3 +405,85 @@ function formatHour(h: number) {
   const am = h < 12; const hr = h % 12 || 12;
   return `${hr} ${am ? "AM" : "PM"}`;
 }
+
+/* ---------------- Day · Room lanes ---------------- */
+
+function DayRoomLanes({
+  cursor,
+  appts,
+  rooms,
+  onSelect,
+  onDropTo,
+  onQuickCreate,
+}: ViewProps & { rooms: { id: string; name: string }[] }) {
+  const day = cursor;
+  const lanes = [{ id: "__none", name: "No room" }, ...rooms];
+  const dayAppts = appts.filter((a) => sameDay(new Date(a.scheduled_at), day));
+
+  return (
+    <div className="overflow-x-auto">
+      <div
+        className="grid min-w-[760px]"
+        style={{ gridTemplateColumns: `64px repeat(${lanes.length}, minmax(0, 1fr))` }}
+      >
+        <div className="border-b border-border" />
+        {lanes.map((r) => (
+          <div key={r.id} className="border-b border-l border-border px-2 py-2 text-center">
+            <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Room</div>
+            <div className="text-sm font-semibold truncate">{r.name}</div>
+          </div>
+        ))}
+        {HOURS.map((h) => (
+          <RoomRow
+            key={h}
+            hour={h}
+            day={day}
+            lanes={lanes}
+            appts={dayAppts}
+            onSelect={onSelect}
+            onDropTo={onDropTo}
+            onQuickCreate={onQuickCreate}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function RoomRow({
+  hour, day, lanes, appts, onSelect, onDropTo, onQuickCreate,
+}: {
+  hour: number; day: Date; lanes: { id: string; name: string }[];
+} & Pick<ViewProps, "appts" | "onSelect" | "onDropTo" | "onQuickCreate">) {
+  return (
+    <>
+      <div className="border-b border-border text-[11px] text-muted-foreground text-right pr-2 pt-1 tabular-nums">{formatHour(hour)}</div>
+      {lanes.map((lane) => {
+        const cellDate = setHour(day, hour);
+        const cell = appts.filter((a) => {
+          const t = new Date(a.scheduled_at);
+          if (t.getHours() !== hour) return false;
+          return lane.id === "__none" ? !a.room_id : a.room_id === lane.id;
+        });
+        return (
+          <DropCell
+            key={lane.id + hour}
+            onDrop={(appt) => onDropTo({ ...appt, room_id: lane.id === "__none" ? null : lane.id } as AppointmentWithRefs, cellDate)}
+            className="relative min-h-[56px] border-b border-l border-border group hover:bg-primary/[0.03] transition"
+          >
+            <button
+              onClick={() => onQuickCreate(cellDate)}
+              className="absolute inset-0 opacity-0 group-hover:opacity-100 text-[11px] text-muted-foreground transition flex items-start justify-end p-1"
+              aria-label={`Create at ${cellDate.toLocaleString()}`}
+            >
+              <Plus className="size-3" />
+            </button>
+            <div className="relative p-1 flex flex-col gap-1">
+              {cell.map((a) => <EventChip key={a.id} appt={a} onClick={() => onSelect(a)} />)}
+            </div>
+          </DropCell>
+        );
+      })}
+    </>
+  );
+}
