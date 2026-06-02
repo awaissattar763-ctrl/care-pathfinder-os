@@ -58,7 +58,12 @@ export type Database = {
           patient_id: string
           provider_id: string | null
           reason: string | null
+          recurrence_end: string | null
+          recurrence_rule: string | null
+          reminder_sent_at: string | null
+          room_id: string | null
           scheduled_at: string
+          series_id: string | null
           status: string
           visit_type: string
         }
@@ -70,7 +75,12 @@ export type Database = {
           patient_id: string
           provider_id?: string | null
           reason?: string | null
+          recurrence_end?: string | null
+          recurrence_rule?: string | null
+          reminder_sent_at?: string | null
+          room_id?: string | null
           scheduled_at: string
+          series_id?: string | null
           status?: string
           visit_type?: string
         }
@@ -82,7 +92,12 @@ export type Database = {
           patient_id?: string
           provider_id?: string | null
           reason?: string | null
+          recurrence_end?: string | null
+          recurrence_rule?: string | null
+          reminder_sent_at?: string | null
+          room_id?: string | null
           scheduled_at?: string
+          series_id?: string | null
           status?: string
           visit_type?: string
         }
@@ -349,6 +364,45 @@ export type Database = {
           },
         ]
       }
+      provider_schedules: {
+        Row: {
+          created_at: string
+          end_minute: number | null
+          ends_at: string | null
+          id: string
+          kind: string
+          note: string | null
+          provider_id: string
+          start_minute: number | null
+          starts_at: string | null
+          weekday: number | null
+        }
+        Insert: {
+          created_at?: string
+          end_minute?: number | null
+          ends_at?: string | null
+          id?: string
+          kind?: string
+          note?: string | null
+          provider_id: string
+          start_minute?: number | null
+          starts_at?: string | null
+          weekday?: number | null
+        }
+        Update: {
+          created_at?: string
+          end_minute?: number | null
+          ends_at?: string | null
+          id?: string
+          kind?: string
+          note?: string | null
+          provider_id?: string
+          start_minute?: number | null
+          starts_at?: string | null
+          weekday?: number | null
+        }
+        Relationships: []
+      }
       providers: {
         Row: {
           created_at: string
@@ -376,6 +430,33 @@ export type Database = {
           npi?: string | null
           specialty?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      rooms: {
+        Row: {
+          active: boolean
+          color: string | null
+          created_at: string
+          id: string
+          location: string | null
+          name: string
+        }
+        Insert: {
+          active?: boolean
+          color?: string | null
+          created_at?: string
+          id?: string
+          location?: string | null
+          name: string
+        }
+        Update: {
+          active?: boolean
+          color?: string | null
+          created_at?: string
+          id?: string
+          location?: string | null
+          name?: string
         }
         Relationships: []
       }
@@ -487,6 +568,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      waitlist: {
+        Row: {
+          created_at: string
+          duration_min: number
+          id: string
+          notes: string | null
+          patient_id: string
+          preferred_from: string | null
+          preferred_to: string | null
+          priority: number
+          provider_id: string | null
+          reason: string | null
+          status: string
+          updated_at: string
+          visit_type: string
+        }
+        Insert: {
+          created_at?: string
+          duration_min?: number
+          id?: string
+          notes?: string | null
+          patient_id: string
+          preferred_from?: string | null
+          preferred_to?: string | null
+          priority?: number
+          provider_id?: string | null
+          reason?: string | null
+          status?: string
+          updated_at?: string
+          visit_type?: string
+        }
+        Update: {
+          created_at?: string
+          duration_min?: number
+          id?: string
+          notes?: string | null
+          patient_id?: string
+          preferred_from?: string | null
+          preferred_to?: string | null
+          priority?: number
+          provider_id?: string | null
+          reason?: string | null
+          status?: string
+          updated_at?: string
+          visit_type?: string
+        }
+        Relationships: []
       }
     }
     Views: {
