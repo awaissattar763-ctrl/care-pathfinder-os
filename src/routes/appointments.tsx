@@ -477,7 +477,7 @@ function RoomRow({
         return (
           <DropCell
             key={lane.id + hour}
-            onDrop={(appt) => onDropTo({ ...appt, room_id: lane.id === "__none" ? null : lane.id } as AppointmentWithRefs, cellDate)}
+            onDrop={(appt) => onDropTo(appt, cellDate, { roomId: lane.id === "__none" ? null : lane.id })}
             className="relative min-h-[56px] border-b border-l border-border group hover:bg-primary/[0.03] transition"
           >
             <button
