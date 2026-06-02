@@ -68,19 +68,24 @@ function AppointmentsPage() {
 
   const openQuickCreate = (d?: Date) => { setQuickDate(d); setQuickOpen(true); };
 
-  const onDropTo = async (appt: AppointmentWithRefs, target: Date, opts?: { keepTime?: boolean }) => {
+  const onDropTo = async (
+    appt: AppointmentWithRefs,
+    target: Date,
+    opts?: { keepTime?: boolean; roomId?: string | null },
+  ) => {
     const orig = new Date(appt.scheduled_at);
     const next = new Date(target);
     if (opts?.keepTime) {
       next.setHours(orig.getHours(), orig.getMinutes(), 0, 0);
     }
-    if (next.getTime() === orig.getTime()) return;
+    const roomChanged = opts?.roomId !== undefined && opts.roomId !== appt.room_id;
+    if (next.getTime() === orig.getTime() && !roomChanged) return;
     const conflict = findConflict(data ?? [], {
       id: appt.id,
       scheduled_at: next.toISOString(),
       duration_min: appt.duration_min,
       provider_id: appt.provider_id,
-      room_id: appt.room_id,
+      room_id: opts?.roomId !== undefined ? opts.roomId : appt.room_id,
     });
     if (conflict) {
       toast.error(
@@ -88,7 +93,11 @@ function AppointmentsPage() {
       );
       return;
     }
-    await update.mutateAsync({ id: appt.id, scheduled_at: next.toISOString() });
+    await update.mutateAsync({
+      id: appt.id,
+      scheduled_at: next.toISOString(),
+      ...(roomChanged ? { room_id: opts?.roomId ?? null } : {}),
+    });
   };
 
   return (
