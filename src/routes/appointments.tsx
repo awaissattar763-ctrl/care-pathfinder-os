@@ -1,16 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "@/components/PageHeader";
-import { Plus, ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
+import { Plus, ChevronLeft, ChevronRight, CalendarDays, ListChecks } from "lucide-react";
 import {
   useAppointments,
   useProviders,
   useUpdateAppointment,
+  useAppointmentsRealtime,
+  useRooms,
+  findConflict,
   type AppointmentWithRefs,
 } from "@/hooks/queries";
 import { NewAppointmentDialog } from "@/components/dialogs/NewAppointmentDialog";
+import { WaitlistDrawer } from "@/components/appointments/WaitlistDrawer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/EmptyState";
 import { useMemo, useState, type DragEvent } from "react";
+import { toast } from "sonner";
 import {
   AppointmentDetailDrawer,
   statusDot,
@@ -30,7 +35,9 @@ function sameDay(a: Date, b: Date) { return a.toDateString() === b.toDateString(
 function AppointmentsPage() {
   const { data, isLoading } = useAppointments();
   const { data: providers } = useProviders();
+  const { data: rooms } = useRooms();
   const update = useUpdateAppointment();
+  useAppointmentsRealtime();
 
   const [view, setView] = useState<ViewMode>("week");
   const [cursor, setCursor] = useState<Date>(startOfDay(new Date()));
@@ -38,6 +45,8 @@ function AppointmentsPage() {
   const [selected, setSelected] = useState<AppointmentWithRefs | null>(null);
   const [quickOpen, setQuickOpen] = useState(false);
   const [quickDate, setQuickDate] = useState<Date | undefined>();
+  const [waitlistOpen, setWaitlistOpen] = useState(false);
+  const [showRoomLanes, setShowRoomLanes] = useState(false);
 
   const appts = useMemo(() => {
     return (data ?? []).filter((a) => providerFilter === "all" || a.provider_id === providerFilter);
@@ -59,14 +68,36 @@ function AppointmentsPage() {
 
   const openQuickCreate = (d?: Date) => { setQuickDate(d); setQuickOpen(true); };
 
-  const onDropTo = async (appt: AppointmentWithRefs, target: Date, opts?: { keepTime?: boolean }) => {
+  const onDropTo = async (
+    appt: AppointmentWithRefs,
+    target: Date,
+    opts?: { keepTime?: boolean; roomId?: string | null },
+  ) => {
     const orig = new Date(appt.scheduled_at);
     const next = new Date(target);
     if (opts?.keepTime) {
       next.setHours(orig.getHours(), orig.getMinutes(), 0, 0);
     }
-    if (next.getTime() === orig.getTime()) return;
-    await update.mutateAsync({ id: appt.id, scheduled_at: next.toISOString() });
+    const roomChanged = opts?.roomId !== undefined && opts.roomId !== appt.room_id;
+    if (next.getTime() === orig.getTime() && !roomChanged) return;
+    const conflict = findConflict(data ?? [], {
+      id: appt.id,
+      scheduled_at: next.toISOString(),
+      duration_min: appt.duration_min,
+      provider_id: appt.provider_id,
+      room_id: opts?.roomId !== undefined ? opts.roomId : appt.room_id,
+    });
+    if (conflict) {
+      toast.error(
+        `Conflict: ${conflict.patient?.name ?? "another visit"} at ${new Date(conflict.scheduled_at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`,
+      );
+      return;
+    }
+    await update.mutateAsync({
+      id: appt.id,
+      scheduled_at: next.toISOString(),
+      ...(roomChanged ? { room_id: opts?.roomId ?? null } : {}),
+    });
   };
 
   return (
@@ -86,6 +117,9 @@ function AppointmentsPage() {
               <option value="all">All providers</option>
               {providers?.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
             </select>
+            <button className="btn btn-secondary" onClick={() => setWaitlistOpen(true)}>
+              <ListChecks className="size-4" /> Waitlist
+            </button>
             <NewAppointmentDialog trigger={<button className="btn btn-primary"><Plus className="size-4" /> Book</button>} />
           </>
         }
@@ -110,7 +144,15 @@ function AppointmentsPage() {
             </button>
           ))}
         </div>
-        <Legend />
+        <div className="flex items-center gap-3">
+          {view === "day" && rooms && rooms.length > 0 && (
+            <label className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground cursor-pointer select-none">
+              <input type="checkbox" className="accent-primary" checked={showRoomLanes} onChange={(e) => setShowRoomLanes(e.target.checked)} />
+              Room lanes
+            </label>
+          )}
+          <Legend />
+        </div>
       </div>
 
       <div className="surface overflow-hidden">
@@ -127,6 +169,8 @@ function AppointmentsPage() {
           <MonthView cursor={cursor} appts={appts} onSelect={setSelected} onDropTo={onDropTo} onQuickCreate={openQuickCreate} />
         ) : view === "week" ? (
           <WeekView cursor={cursor} appts={appts} onSelect={setSelected} onDropTo={onDropTo} onQuickCreate={openQuickCreate} />
+        ) : showRoomLanes && rooms && rooms.length > 0 ? (
+          <DayRoomLanes cursor={cursor} appts={appts} rooms={rooms} onSelect={setSelected} onDropTo={onDropTo} onQuickCreate={openQuickCreate} />
         ) : (
           <DayView cursor={cursor} appts={appts} onSelect={setSelected} onDropTo={onDropTo} onQuickCreate={openQuickCreate} />
         )}
@@ -134,6 +178,15 @@ function AppointmentsPage() {
 
       <AppointmentDetailDrawer appt={selected} open={!!selected} onOpenChange={(o) => !o && setSelected(null)} />
       <NewAppointmentDialog open={quickOpen} onOpenChange={setQuickOpen} initialDate={quickDate} />
+      <WaitlistDrawer
+        open={waitlistOpen}
+        onOpenChange={setWaitlistOpen}
+        onOffer={() => {
+          setWaitlistOpen(false);
+          setQuickDate(new Date());
+          setQuickOpen(true);
+        }}
+      />
     </div>
   );
 }
@@ -304,7 +357,7 @@ type ViewProps = {
   cursor: Date;
   appts: AppointmentWithRefs[];
   onSelect: (a: AppointmentWithRefs) => void;
-  onDropTo: (appt: AppointmentWithRefs, target: Date, opts?: { keepTime?: boolean }) => void;
+  onDropTo: (appt: AppointmentWithRefs, target: Date, opts?: { keepTime?: boolean; roomId?: string | null }) => void;
   onQuickCreate: (d?: Date) => void;
 };
 
@@ -360,4 +413,86 @@ function setHour(d: Date, h: number) { const x = startOfDay(d); x.setHours(h, 0,
 function formatHour(h: number) {
   const am = h < 12; const hr = h % 12 || 12;
   return `${hr} ${am ? "AM" : "PM"}`;
+}
+
+/* ---------------- Day · Room lanes ---------------- */
+
+function DayRoomLanes({
+  cursor,
+  appts,
+  rooms,
+  onSelect,
+  onDropTo,
+  onQuickCreate,
+}: ViewProps & { rooms: { id: string; name: string }[] }) {
+  const day = cursor;
+  const lanes = [{ id: "__none", name: "No room" }, ...rooms];
+  const dayAppts = appts.filter((a) => sameDay(new Date(a.scheduled_at), day));
+
+  return (
+    <div className="overflow-x-auto">
+      <div
+        className="grid min-w-[760px]"
+        style={{ gridTemplateColumns: `64px repeat(${lanes.length}, minmax(0, 1fr))` }}
+      >
+        <div className="border-b border-border" />
+        {lanes.map((r) => (
+          <div key={r.id} className="border-b border-l border-border px-2 py-2 text-center">
+            <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Room</div>
+            <div className="text-sm font-semibold truncate">{r.name}</div>
+          </div>
+        ))}
+        {HOURS.map((h) => (
+          <RoomRow
+            key={h}
+            hour={h}
+            day={day}
+            lanes={lanes}
+            appts={dayAppts}
+            onSelect={onSelect}
+            onDropTo={onDropTo}
+            onQuickCreate={onQuickCreate}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function RoomRow({
+  hour, day, lanes, appts, onSelect, onDropTo, onQuickCreate,
+}: {
+  hour: number; day: Date; lanes: { id: string; name: string }[];
+} & Pick<ViewProps, "appts" | "onSelect" | "onDropTo" | "onQuickCreate">) {
+  return (
+    <>
+      <div className="border-b border-border text-[11px] text-muted-foreground text-right pr-2 pt-1 tabular-nums">{formatHour(hour)}</div>
+      {lanes.map((lane) => {
+        const cellDate = setHour(day, hour);
+        const cell = appts.filter((a) => {
+          const t = new Date(a.scheduled_at);
+          if (t.getHours() !== hour) return false;
+          return lane.id === "__none" ? !a.room_id : a.room_id === lane.id;
+        });
+        return (
+          <DropCell
+            key={lane.id + hour}
+            onDrop={(appt) => onDropTo(appt, cellDate, { roomId: lane.id === "__none" ? null : lane.id })}
+            className="relative min-h-[56px] border-b border-l border-border group hover:bg-primary/[0.03] transition"
+          >
+            <button
+              onClick={() => onQuickCreate(cellDate)}
+              className="absolute inset-0 opacity-0 group-hover:opacity-100 text-[11px] text-muted-foreground transition flex items-start justify-end p-1"
+              aria-label={`Create at ${cellDate.toLocaleString()}`}
+            >
+              <Plus className="size-3" />
+            </button>
+            <div className="relative p-1 flex flex-col gap-1">
+              {cell.map((a) => <EventChip key={a.id} appt={a} onClick={() => onSelect(a)} />)}
+            </div>
+          </DropCell>
+        );
+      })}
+    </>
+  );
 }
