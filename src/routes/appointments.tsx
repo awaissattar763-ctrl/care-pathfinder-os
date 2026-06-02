@@ -1,16 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "@/components/PageHeader";
-import { Plus, ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
+import { Plus, ChevronLeft, ChevronRight, CalendarDays, ListChecks } from "lucide-react";
 import {
   useAppointments,
   useProviders,
   useUpdateAppointment,
+  useAppointmentsRealtime,
+  useRooms,
+  findConflict,
   type AppointmentWithRefs,
 } from "@/hooks/queries";
 import { NewAppointmentDialog } from "@/components/dialogs/NewAppointmentDialog";
+import { WaitlistDrawer } from "@/components/appointments/WaitlistDrawer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/EmptyState";
 import { useMemo, useState, type DragEvent } from "react";
+import { toast } from "sonner";
 import {
   AppointmentDetailDrawer,
   statusDot,
@@ -30,7 +35,9 @@ function sameDay(a: Date, b: Date) { return a.toDateString() === b.toDateString(
 function AppointmentsPage() {
   const { data, isLoading } = useAppointments();
   const { data: providers } = useProviders();
+  const { data: rooms } = useRooms();
   const update = useUpdateAppointment();
+  useAppointmentsRealtime();
 
   const [view, setView] = useState<ViewMode>("week");
   const [cursor, setCursor] = useState<Date>(startOfDay(new Date()));
@@ -38,6 +45,8 @@ function AppointmentsPage() {
   const [selected, setSelected] = useState<AppointmentWithRefs | null>(null);
   const [quickOpen, setQuickOpen] = useState(false);
   const [quickDate, setQuickDate] = useState<Date | undefined>();
+  const [waitlistOpen, setWaitlistOpen] = useState(false);
+  const [showRoomLanes, setShowRoomLanes] = useState(false);
 
   const appts = useMemo(() => {
     return (data ?? []).filter((a) => providerFilter === "all" || a.provider_id === providerFilter);
@@ -66,6 +75,19 @@ function AppointmentsPage() {
       next.setHours(orig.getHours(), orig.getMinutes(), 0, 0);
     }
     if (next.getTime() === orig.getTime()) return;
+    const conflict = findConflict(data ?? [], {
+      id: appt.id,
+      scheduled_at: next.toISOString(),
+      duration_min: appt.duration_min,
+      provider_id: appt.provider_id,
+      room_id: appt.room_id,
+    });
+    if (conflict) {
+      toast.error(
+        `Conflict: ${conflict.patient?.name ?? "another visit"} at ${new Date(conflict.scheduled_at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`,
+      );
+      return;
+    }
     await update.mutateAsync({ id: appt.id, scheduled_at: next.toISOString() });
   };
 
@@ -86,6 +108,9 @@ function AppointmentsPage() {
               <option value="all">All providers</option>
               {providers?.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
             </select>
+            <button className="btn btn-secondary" onClick={() => setWaitlistOpen(true)}>
+              <ListChecks className="size-4" /> Waitlist
+            </button>
             <NewAppointmentDialog trigger={<button className="btn btn-primary"><Plus className="size-4" /> Book</button>} />
           </>
         }
@@ -110,7 +135,15 @@ function AppointmentsPage() {
             </button>
           ))}
         </div>
-        <Legend />
+        <div className="flex items-center gap-3">
+          {view === "day" && rooms && rooms.length > 0 && (
+            <label className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground cursor-pointer select-none">
+              <input type="checkbox" className="accent-primary" checked={showRoomLanes} onChange={(e) => setShowRoomLanes(e.target.checked)} />
+              Room lanes
+            </label>
+          )}
+          <Legend />
+        </div>
       </div>
 
       <div className="surface overflow-hidden">
@@ -127,6 +160,8 @@ function AppointmentsPage() {
           <MonthView cursor={cursor} appts={appts} onSelect={setSelected} onDropTo={onDropTo} onQuickCreate={openQuickCreate} />
         ) : view === "week" ? (
           <WeekView cursor={cursor} appts={appts} onSelect={setSelected} onDropTo={onDropTo} onQuickCreate={openQuickCreate} />
+        ) : showRoomLanes && rooms && rooms.length > 0 ? (
+          <DayRoomLanes cursor={cursor} appts={appts} rooms={rooms} onSelect={setSelected} onDropTo={onDropTo} onQuickCreate={openQuickCreate} />
         ) : (
           <DayView cursor={cursor} appts={appts} onSelect={setSelected} onDropTo={onDropTo} onQuickCreate={openQuickCreate} />
         )}
@@ -134,6 +169,15 @@ function AppointmentsPage() {
 
       <AppointmentDetailDrawer appt={selected} open={!!selected} onOpenChange={(o) => !o && setSelected(null)} />
       <NewAppointmentDialog open={quickOpen} onOpenChange={setQuickOpen} initialDate={quickDate} />
+      <WaitlistDrawer
+        open={waitlistOpen}
+        onOpenChange={setWaitlistOpen}
+        onOffer={() => {
+          setWaitlistOpen(false);
+          setQuickDate(new Date());
+          setQuickOpen(true);
+        }}
+      />
     </div>
   );
 }
