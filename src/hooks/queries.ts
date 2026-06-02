@@ -466,16 +466,13 @@ export function useWaitlist(status: string | "all" = "waiting") {
     queryFn: async () => {
       let q = supabase
         .from("waitlist")
-        .select("*, patient:patients(id,name,mrn,phone,email), provider:providers(id,name)")
+        .select("*")
         .order("priority", { ascending: false })
         .order("created_at", { ascending: true });
       if (status !== "all") q = q.eq("status", status);
       const { data, error } = await q;
       if (error) throw error;
-      return data as (Waitlist & {
-        patient: Pick<Patient, "id" | "name" | "mrn" | "phone" | "email"> | null;
-        provider: Pick<Provider, "id" | "name"> | null;
-      })[];
+      return data as Waitlist[];
     },
   });
 }
