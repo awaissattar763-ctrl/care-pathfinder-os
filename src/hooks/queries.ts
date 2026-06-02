@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { toast } from "sonner";
 import { logAudit } from "@/lib/audit";
+import { useEffect } from "react";
 
 export type Patient = Database["public"]["Tables"]["patients"]["Row"];
 export type PatientInsert = Database["public"]["Tables"]["patients"]["Insert"];
@@ -17,6 +18,10 @@ export type Allergy = Database["public"]["Tables"]["allergies"]["Row"];
 export type Vital = Database["public"]["Tables"]["vitals"]["Row"];
 export type Document = Database["public"]["Tables"]["documents"]["Row"];
 export type SoapNote = Database["public"]["Tables"]["soap_notes"]["Row"];
+export type Room = Database["public"]["Tables"]["rooms"]["Row"];
+export type ProviderSchedule = Database["public"]["Tables"]["provider_schedules"]["Row"];
+export type Waitlist = Database["public"]["Tables"]["waitlist"]["Row"];
+export type WaitlistInsert = Database["public"]["Tables"]["waitlist"]["Insert"];
 
 /* ---------------- Patients ---------------- */
 
@@ -147,7 +152,7 @@ export function useAppointments() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("appointments")
-        .select("*, patient:patients(id,name,mrn,phone,email,urgency), provider:providers(id,name,specialty)")
+        .select("*, patient:patients(id,name,mrn,phone,email,urgency), provider:providers(id,name,specialty), room:rooms(id,name,color)")
         .order("scheduled_at", { ascending: true });
       if (error) throw error;
       return data as AppointmentWithRefs[];
@@ -158,6 +163,7 @@ export function useAppointments() {
 export type AppointmentWithRefs = Appointment & {
   patient: Pick<Patient, "id" | "name" | "mrn" | "phone" | "email" | "urgency"> | null;
   provider: Pick<Provider, "id" | "name" | "specialty"> | null;
+  room?: Pick<Room, "id" | "name" | "color"> | null;
 };
 
 export function useProviders() {
