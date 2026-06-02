@@ -1,10 +1,11 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import type { AppointmentWithRefs } from "@/hooks/queries";
-import { useUpdateAppointment, useCancelAppointment, useProviders } from "@/hooks/queries";
-import { Calendar, Clock, Mail, Phone, User, Stethoscope, Video, MapPin, X, History } from "lucide-react";
+import { useUpdateAppointment, useCancelAppointment, useProviders, useCancelSeries } from "@/hooks/queries";
+import { Calendar, Clock, Mail, Phone, User, Stethoscope, Video, MapPin, X, History, Download, Repeat } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { downloadICS } from "@/lib/ics";
 
 const statusOptions = ["confirmed", "checked-in", "in-progress", "completed", "cancelled", "no-show"];
 
@@ -19,6 +20,7 @@ export function AppointmentDetailDrawer({
 }) {
   const update = useUpdateAppointment();
   const cancel = useCancelAppointment();
+  const cancelSeries = useCancelSeries();
   const { data: providers } = useProviders();
   const [editing, setEditing] = useState(false);
   const [when, setWhen] = useState("");
@@ -76,7 +78,12 @@ export function AppointmentDetailDrawer({
               <div className="text-[11px] uppercase tracking-[0.14em] text-primary font-semibold">
                 Appointment
               </div>
-              <span className={`pill ${statusPill(appt.status)}`}>{appt.status}</span>
+              <div className="flex items-center gap-2">
+                {appt.series_id && (
+                  <span className="pill pill--info inline-flex items-center gap-1"><Repeat className="size-3" /> series</span>
+                )}
+                <span className={`pill ${statusPill(appt.status)}`}>{appt.status}</span>
+              </div>
             </div>
             <SheetTitle className="text-lg mt-1.5">{appt.reason ?? "Visit"}</SheetTitle>
             <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
@@ -188,14 +195,33 @@ export function AppointmentDetailDrawer({
             )}
           </section>
 
-          <div className="pt-4 border-t border-border flex items-center justify-between">
-            <button
-              className="btn btn-ghost text-destructive hover:bg-destructive/10"
-              disabled={appt.status === "cancelled" || cancel.isPending}
-              onClick={() => cancel.mutate({ id: appt.id }, { onSuccess: () => onOpenChange(false) })}
-            >
-              <X className="size-4" /> Cancel appointment
+          <div className="pt-4 border-t border-border flex items-center justify-between flex-wrap gap-2">
+            <button className="btn btn-secondary btn-sm" onClick={() => downloadICS(appt)}>
+              <Download className="size-3.5" /> Export .ics
             </button>
+            <div className="flex items-center gap-2">
+              {appt.series_id && (
+                <button
+                  className="btn btn-ghost btn-sm text-destructive hover:bg-destructive/10"
+                  disabled={cancelSeries.isPending}
+                  onClick={() =>
+                    cancelSeries.mutate(
+                      { seriesId: appt.series_id!, fromDate: appt.scheduled_at },
+                      { onSuccess: () => onOpenChange(false) },
+                    )
+                  }
+                >
+                  Cancel series
+                </button>
+              )}
+              <button
+                className="btn btn-ghost btn-sm text-destructive hover:bg-destructive/10"
+                disabled={appt.status === "cancelled" || cancel.isPending}
+                onClick={() => cancel.mutate({ id: appt.id }, { onSuccess: () => onOpenChange(false) })}
+              >
+                <X className="size-4" /> Cancel
+              </button>
+            </div>
           </div>
         </div>
       </SheetContent>
