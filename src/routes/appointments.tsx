@@ -357,7 +357,7 @@ type ViewProps = {
   cursor: Date;
   appts: AppointmentWithRefs[];
   onSelect: (a: AppointmentWithRefs) => void;
-  onDropTo: (appt: AppointmentWithRefs, target: Date, opts?: { keepTime?: boolean }) => void;
+  onDropTo: (appt: AppointmentWithRefs, target: Date, opts?: { keepTime?: boolean; roomId?: string | null }) => void;
   onQuickCreate: (d?: Date) => void;
 };
 
