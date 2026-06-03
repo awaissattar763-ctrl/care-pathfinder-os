@@ -34,6 +34,7 @@ import { UrgencyBadge, type Urgency } from "@/components/UrgencyBadge";
 import { usePatientDetails } from "@/hooks/queries";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/EmptyState";
+import { ClinicalCopilotPanel } from "@/components/copilot/ClinicalCopilotPanel";
 
 import { cn } from "@/lib/utils";
 
@@ -460,31 +461,22 @@ function PatientProfilePage() {
           </SectionCard>
 
           {/* AI Summary */}
-          <SectionCard
-            id="summary"
-            icon={Sparkles}
-            title="AI-generated medical summary"
-            description="Assistive only — clinician must verify before acting."
-            action={
-              <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-semibold text-primary bg-primary/10 px-2 py-1 rounded">
-                <Sparkles className="size-3" /> Generated 4 min ago
-              </span>
-            }
-          >
-            <div className="rounded-lg border border-primary/15 bg-primary/[0.04] p-5">
-              <p className="text-sm leading-relaxed text-foreground/90">
-                <span className="font-medium">{patient.name}</span> is a 42-year-old female with a history of <span className="font-medium">essential hypertension</span> (well-controlled on Lisinopril 10 mg) and <span className="font-medium">mild persistent asthma</span>. Recent labs show <span className="font-medium text-warning">borderline elevated LDL (118 mg/dL)</span>; lipid follow-up recommended in 6 months. Blood pressure has trended down over the past 90 days. No acute concerns documented at last encounter.
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-5">
-                <SuggestionPill icon={Activity} title="Lifestyle counseling" detail="Reinforce DASH-style diet & 150 min/wk aerobic." />
-                <SuggestionPill icon={FlaskConical} title="Repeat lipid panel" detail="Schedule for Oct 2026." />
-                <SuggestionPill icon={Calendar} title="3-mo BP recheck" detail="Auto-book Jun 12 at 09:30 confirmed." />
-              </div>
-              <p className="text-[11px] text-muted-foreground mt-4 flex items-center gap-1.5">
-                <Shield className="size-3" /> Summary generated from this patient's de-identified longitudinal record. Source citations available on hover in chart view.
-              </p>
-            </div>
-          </SectionCard>
+          <div id="summary" className="scroll-mt-24">
+            <ClinicalCopilotPanel
+              patient={{
+                id: p.id,
+                name: p.name,
+                insurance: p.insurance,
+                emergency_contact: p.emergency_contact,
+                ai_summary: p.ai_summary,
+              }}
+              allergies={data.allergies as any}
+              vitals={data.vitals as any}
+              prescriptions={data.prescriptions as any}
+              appointments={data.appointments as any}
+              documents={data.documents as any}
+            />
+          </div>
 
           {/* Allergies & Conditions */}
           <SectionCard id="allergies" icon={AlertTriangle} title="Allergies & chronic conditions">
