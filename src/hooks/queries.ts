@@ -612,3 +612,55 @@ export function findConflict(
   }
   return null;
 }
+
+/* ---------------- Telemedicine ---------------- */
+
+export function useTelemedicineSessions() {
+  return useQuery({
+    queryKey: ["telemedicine_sessions"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("appointments")
+        .select(
+          "*, patient:patients(id,name,mrn,phone,email,urgency,dob,sex), provider:providers(id,name,specialty)",
+        )
+        .eq("visit_type", "telehealth")
+        .order("scheduled_at", { ascending: true });
+      if (error) throw error;
+      return data as AppointmentWithRefs[];
+    },
+  });
+}
+
+export function useAppointmentDetail(id: string | undefined) {
+  return useQuery({
+    queryKey: ["appointment_detail", id],
+    enabled: !!id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("appointments")
+        .select("*, patient:patients(*), provider:providers(*)")
+        .eq("id", id!)
+        .maybeSingle();
+      if (error) throw error;
+      return data as (Appointment & { patient: Patient | null; provider: Provider | null }) | null;
+    },
+  });
+}
+
+export function useCreateSoapNote() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (n: Database["public"]["Tables"]["soap_notes"]["Insert"]) => {
+      const { data, error } = await supabase.from("soap_notes").insert(n).select().single();
+      if (error) throw error;
+      await logAudit("soap.create", "soap_note", data.id, { patient_id: data.patient_id });
+      return data as SoapNote;
+    },
+    onSuccess: (_d, v) => {
+      qc.invalidateQueries({ queryKey: ["patient_details", v.patient_id] });
+      toast.success("SOAP note saved to chart");
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Save failed"),
+  });
+}
