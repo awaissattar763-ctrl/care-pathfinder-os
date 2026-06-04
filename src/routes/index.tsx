@@ -10,10 +10,11 @@ import {
   Lock,
   AlertTriangle,
   Gauge,
+  Video,
 } from "lucide-react";
 import { UrgencyBadge } from "@/components/UrgencyBadge";
 import { AIInsightCard } from "@/components/copilot/AIInsightCard";
-import { useDashboardMetrics, useAppointments, useAuditLogs } from "@/hooks/queries";
+import { useDashboardMetrics, useAppointments, useAuditLogs, useTelemedicineSessions } from "@/hooks/queries";
 import { NewAppointmentDialog } from "@/components/dialogs/NewAppointmentDialog";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -25,6 +26,7 @@ function Index() {
   const { data: m, isLoading: metricsLoading } = useDashboardMetrics();
   const { data: appts } = useAppointments();
   const { data: audit } = useAuditLogs(5);
+  const { data: teleSessions } = useTelemedicineSessions();
 
   const now = new Date();
   const startOfDay = new Date(now); startOfDay.setHours(0, 0, 0, 0);
@@ -33,6 +35,14 @@ function Index() {
     const t = new Date(a.scheduled_at);
     return t >= startOfDay && t < endOfDay;
   }).slice(0, 6);
+
+  const upcomingTele = (teleSessions ?? [])
+    .filter((s) => {
+      const t = new Date(s.scheduled_at).getTime();
+      const end = t + (s.duration_min ?? 30) * 60_000;
+      return s.status !== "cancelled" && s.status !== "completed" && end >= Date.now() - 60_000;
+    })
+    .slice(0, 3);
 
   const nextTime = m?.nextAppointmentAt
     ? new Date(m.nextAppointmentAt).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })
