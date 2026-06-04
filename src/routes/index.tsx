@@ -127,6 +127,41 @@ function Index() {
           <div className="surface">
             <div className="section-head">
               <div>
+                <div className="section-head__title">Telemedicine</div>
+                <div className="section-head__sub">{upcomingTele.length} upcoming</div>
+              </div>
+              <Link to="/telemedicine" className="btn btn-ghost btn-sm">Open lobby</Link>
+            </div>
+            {upcomingTele.length === 0 ? (
+              <div className="px-5 py-8 text-center text-sm text-muted-foreground">No upcoming virtual visits.</div>
+            ) : (
+              <ul className="divide-y divide-border">
+                {upcomingTele.map((s) => {
+                  const t = new Date(s.scheduled_at).getTime();
+                  const joinable = Date.now() >= t - 15 * 60_000 && Date.now() <= t + (s.duration_min ?? 30) * 60_000;
+                  return (
+                    <li key={s.id} className="px-5 py-3 flex items-center gap-3">
+                      <div className="size-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center"><Video className="size-4" /></div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium truncate">{s.patient?.name ?? "Unassigned"}</div>
+                        <div className="text-xs text-muted-foreground truncate">
+                          {new Date(s.scheduled_at).toLocaleString(undefined, { weekday: "short", hour: "numeric", minute: "2-digit" })} · {s.reason ?? "Virtual visit"}
+                        </div>
+                      </div>
+                      <Link to="/telemedicine/$appointmentId" params={{ appointmentId: s.id }}
+                        className={joinable ? "btn btn-primary btn-sm" : "btn btn-ghost btn-sm"}>
+                        {joinable ? "Join" : "Open"}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+
+          <div className="surface">
+            <div className="section-head">
+              <div>
                 <div className="section-head__title">Recent activity</div>
                 <div className="section-head__sub">Audit trail</div>
               </div>
