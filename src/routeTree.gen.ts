@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TelemedicineRouteImport } from './routes/telemedicine'
 import { Route as SymptomCheckerRouteImport } from './routes/symptom-checker'
 import { Route as PrescriptionsRouteImport } from './routes/prescriptions'
 import { Route as ComplianceRouteImport } from './routes/compliance'
@@ -17,15 +16,11 @@ import { Route as ClaimsRouteImport } from './routes/claims'
 import { Route as AppointmentsRouteImport } from './routes/appointments'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TelemedicineIndexRouteImport } from './routes/telemedicine.index'
 import { Route as PatientsIndexRouteImport } from './routes/patients.index'
 import { Route as PatientsPatientIdRouteImport } from './routes/patients.$patientId'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 
-const TelemedicineRoute = TelemedicineRouteImport.update({
-  id: '/telemedicine',
-  path: '/telemedicine',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SymptomCheckerRoute = SymptomCheckerRouteImport.update({
   id: '/symptom-checker',
   path: '/symptom-checker',
@@ -61,6 +56,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TelemedicineIndexRoute = TelemedicineIndexRouteImport.update({
+  id: '/telemedicine/',
+  path: '/telemedicine/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PatientsIndexRoute = PatientsIndexRouteImport.update({
   id: '/patients/',
   path: '/patients/',
@@ -85,10 +85,10 @@ export interface FileRoutesByFullPath {
   '/compliance': typeof ComplianceRoute
   '/prescriptions': typeof PrescriptionsRoute
   '/symptom-checker': typeof SymptomCheckerRoute
-  '/telemedicine': typeof TelemedicineRoute
   '/api/chat': typeof ApiChatRoute
   '/patients/$patientId': typeof PatientsPatientIdRoute
   '/patients/': typeof PatientsIndexRoute
+  '/telemedicine/': typeof TelemedicineIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -98,10 +98,10 @@ export interface FileRoutesByTo {
   '/compliance': typeof ComplianceRoute
   '/prescriptions': typeof PrescriptionsRoute
   '/symptom-checker': typeof SymptomCheckerRoute
-  '/telemedicine': typeof TelemedicineRoute
   '/api/chat': typeof ApiChatRoute
   '/patients/$patientId': typeof PatientsPatientIdRoute
   '/patients': typeof PatientsIndexRoute
+  '/telemedicine': typeof TelemedicineIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -112,10 +112,10 @@ export interface FileRoutesById {
   '/compliance': typeof ComplianceRoute
   '/prescriptions': typeof PrescriptionsRoute
   '/symptom-checker': typeof SymptomCheckerRoute
-  '/telemedicine': typeof TelemedicineRoute
   '/api/chat': typeof ApiChatRoute
   '/patients/$patientId': typeof PatientsPatientIdRoute
   '/patients/': typeof PatientsIndexRoute
+  '/telemedicine/': typeof TelemedicineIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -127,10 +127,10 @@ export interface FileRouteTypes {
     | '/compliance'
     | '/prescriptions'
     | '/symptom-checker'
-    | '/telemedicine'
     | '/api/chat'
     | '/patients/$patientId'
     | '/patients/'
+    | '/telemedicine/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -140,10 +140,10 @@ export interface FileRouteTypes {
     | '/compliance'
     | '/prescriptions'
     | '/symptom-checker'
-    | '/telemedicine'
     | '/api/chat'
     | '/patients/$patientId'
     | '/patients'
+    | '/telemedicine'
   id:
     | '__root__'
     | '/'
@@ -153,10 +153,10 @@ export interface FileRouteTypes {
     | '/compliance'
     | '/prescriptions'
     | '/symptom-checker'
-    | '/telemedicine'
     | '/api/chat'
     | '/patients/$patientId'
     | '/patients/'
+    | '/telemedicine/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -167,21 +167,14 @@ export interface RootRouteChildren {
   ComplianceRoute: typeof ComplianceRoute
   PrescriptionsRoute: typeof PrescriptionsRoute
   SymptomCheckerRoute: typeof SymptomCheckerRoute
-  TelemedicineRoute: typeof TelemedicineRoute
   ApiChatRoute: typeof ApiChatRoute
   PatientsPatientIdRoute: typeof PatientsPatientIdRoute
   PatientsIndexRoute: typeof PatientsIndexRoute
+  TelemedicineIndexRoute: typeof TelemedicineIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/telemedicine': {
-      id: '/telemedicine'
-      path: '/telemedicine'
-      fullPath: '/telemedicine'
-      preLoaderRoute: typeof TelemedicineRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/symptom-checker': {
       id: '/symptom-checker'
       path: '/symptom-checker'
@@ -231,6 +224,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/telemedicine/': {
+      id: '/telemedicine/'
+      path: '/telemedicine'
+      fullPath: '/telemedicine/'
+      preLoaderRoute: typeof TelemedicineIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/patients/': {
       id: '/patients/'
       path: '/patients'
@@ -263,11 +263,21 @@ const rootRouteChildren: RootRouteChildren = {
   ComplianceRoute: ComplianceRoute,
   PrescriptionsRoute: PrescriptionsRoute,
   SymptomCheckerRoute: SymptomCheckerRoute,
-  TelemedicineRoute: TelemedicineRoute,
   ApiChatRoute: ApiChatRoute,
   PatientsPatientIdRoute: PatientsPatientIdRoute,
   PatientsIndexRoute: PatientsIndexRoute,
+  TelemedicineIndexRoute: TelemedicineIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
