@@ -18,6 +18,7 @@ import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TelemedicineIndexRouteImport } from './routes/telemedicine.index'
 import { Route as PatientsIndexRouteImport } from './routes/patients.index'
+import { Route as TelemedicineAppointmentIdRouteImport } from './routes/telemedicine.$appointmentId'
 import { Route as PatientsPatientIdRouteImport } from './routes/patients.$patientId'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 
@@ -66,6 +67,12 @@ const PatientsIndexRoute = PatientsIndexRouteImport.update({
   path: '/patients/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TelemedicineAppointmentIdRoute =
+  TelemedicineAppointmentIdRouteImport.update({
+    id: '/telemedicine/$appointmentId',
+    path: '/telemedicine/$appointmentId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const PatientsPatientIdRoute = PatientsPatientIdRouteImport.update({
   id: '/patients/$patientId',
   path: '/patients/$patientId',
@@ -87,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/symptom-checker': typeof SymptomCheckerRoute
   '/api/chat': typeof ApiChatRoute
   '/patients/$patientId': typeof PatientsPatientIdRoute
+  '/telemedicine/$appointmentId': typeof TelemedicineAppointmentIdRoute
   '/patients/': typeof PatientsIndexRoute
   '/telemedicine/': typeof TelemedicineIndexRoute
 }
@@ -100,6 +108,7 @@ export interface FileRoutesByTo {
   '/symptom-checker': typeof SymptomCheckerRoute
   '/api/chat': typeof ApiChatRoute
   '/patients/$patientId': typeof PatientsPatientIdRoute
+  '/telemedicine/$appointmentId': typeof TelemedicineAppointmentIdRoute
   '/patients': typeof PatientsIndexRoute
   '/telemedicine': typeof TelemedicineIndexRoute
 }
@@ -114,6 +123,7 @@ export interface FileRoutesById {
   '/symptom-checker': typeof SymptomCheckerRoute
   '/api/chat': typeof ApiChatRoute
   '/patients/$patientId': typeof PatientsPatientIdRoute
+  '/telemedicine/$appointmentId': typeof TelemedicineAppointmentIdRoute
   '/patients/': typeof PatientsIndexRoute
   '/telemedicine/': typeof TelemedicineIndexRoute
 }
@@ -129,6 +139,7 @@ export interface FileRouteTypes {
     | '/symptom-checker'
     | '/api/chat'
     | '/patients/$patientId'
+    | '/telemedicine/$appointmentId'
     | '/patients/'
     | '/telemedicine/'
   fileRoutesByTo: FileRoutesByTo
@@ -142,6 +153,7 @@ export interface FileRouteTypes {
     | '/symptom-checker'
     | '/api/chat'
     | '/patients/$patientId'
+    | '/telemedicine/$appointmentId'
     | '/patients'
     | '/telemedicine'
   id:
@@ -155,6 +167,7 @@ export interface FileRouteTypes {
     | '/symptom-checker'
     | '/api/chat'
     | '/patients/$patientId'
+    | '/telemedicine/$appointmentId'
     | '/patients/'
     | '/telemedicine/'
   fileRoutesById: FileRoutesById
@@ -169,6 +182,7 @@ export interface RootRouteChildren {
   SymptomCheckerRoute: typeof SymptomCheckerRoute
   ApiChatRoute: typeof ApiChatRoute
   PatientsPatientIdRoute: typeof PatientsPatientIdRoute
+  TelemedicineAppointmentIdRoute: typeof TelemedicineAppointmentIdRoute
   PatientsIndexRoute: typeof PatientsIndexRoute
   TelemedicineIndexRoute: typeof TelemedicineIndexRoute
 }
@@ -238,6 +252,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PatientsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/telemedicine/$appointmentId': {
+      id: '/telemedicine/$appointmentId'
+      path: '/telemedicine/$appointmentId'
+      fullPath: '/telemedicine/$appointmentId'
+      preLoaderRoute: typeof TelemedicineAppointmentIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/patients/$patientId': {
       id: '/patients/$patientId'
       path: '/patients/$patientId'
@@ -265,9 +286,20 @@ const rootRouteChildren: RootRouteChildren = {
   SymptomCheckerRoute: SymptomCheckerRoute,
   ApiChatRoute: ApiChatRoute,
   PatientsPatientIdRoute: PatientsPatientIdRoute,
+  TelemedicineAppointmentIdRoute: TelemedicineAppointmentIdRoute,
   PatientsIndexRoute: PatientsIndexRoute,
   TelemedicineIndexRoute: TelemedicineIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
