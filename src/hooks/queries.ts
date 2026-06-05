@@ -22,6 +22,17 @@ export type Room = Database["public"]["Tables"]["rooms"]["Row"];
 export type ProviderSchedule = Database["public"]["Tables"]["provider_schedules"]["Row"];
 export type Waitlist = Database["public"]["Tables"]["waitlist"]["Row"];
 export type WaitlistInsert = Database["public"]["Tables"]["waitlist"]["Insert"];
+export type LabOrder = Database["public"]["Tables"]["lab_orders"]["Row"];
+export type LabOrderInsert = Database["public"]["Tables"]["lab_orders"]["Insert"];
+export type LabOrderTest = Database["public"]["Tables"]["lab_order_tests"]["Row"];
+export type LabResult = Database["public"]["Tables"]["lab_results"]["Row"];
+export type LabResultInsert = Database["public"]["Tables"]["lab_results"]["Insert"];
+export type LabOrderWithRefs = LabOrder & {
+  patient: Patient | null;
+  provider: Provider | null;
+  tests: LabOrderTest[];
+  results: LabResult[];
+};
 
 /* ---------------- Patients ---------------- */
 
