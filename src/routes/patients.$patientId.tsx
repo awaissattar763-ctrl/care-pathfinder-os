@@ -35,6 +35,8 @@ import { usePatientDetails } from "@/hooks/queries";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/EmptyState";
 import { ClinicalCopilotPanel } from "@/components/copilot/ClinicalCopilotPanel";
+import { useLabOrders } from "@/hooks/queries";
+import { NewLabOrderDialog } from "@/components/dialogs/NewLabOrderDialog";
 
 import { cn } from "@/lib/utils";
 
