@@ -757,7 +757,7 @@ export function useUpdateLabOrderStatus() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (v: { id: string; status: string }) => {
-      const patch: Record<string, unknown> = { status: v.status };
+      const patch: Database["public"]["Tables"]["lab_orders"]["Update"] = { status: v.status };
       if (v.status === "collected") patch.collected_at = new Date().toISOString();
       if (v.status === "resulted") patch.resulted_at = new Date().toISOString();
       const { data, error } = await supabase.from("lab_orders").update(patch).eq("id", v.id).select().single();
