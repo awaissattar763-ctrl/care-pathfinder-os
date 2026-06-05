@@ -35,6 +35,8 @@ import { usePatientDetails } from "@/hooks/queries";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/EmptyState";
 import { ClinicalCopilotPanel } from "@/components/copilot/ClinicalCopilotPanel";
+import { useLabOrders } from "@/hooks/queries";
+import { NewLabOrderDialog } from "@/components/dialogs/NewLabOrderDialog";
 
 import { cn } from "@/lib/utils";
 
@@ -46,6 +48,62 @@ function formatDate(d: string | null | undefined) {
   if (!d) return "—";
   return new Date(d).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
 }
+
+function PatientLabOrders({ patientId }: { patientId: string }) {
+  const { data, isLoading } = useLabOrders(patientId);
+  const orders = data ?? [];
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-2">
+        <div className="text-xs text-muted-foreground">{orders.length} lab order{orders.length === 1 ? "" : "s"}</div>
+        <NewLabOrderDialog
+          defaultPatientId={patientId}
+          trigger={<button className="text-xs text-primary font-medium hover:underline inline-flex items-center gap-1"><Plus className="size-3" /> New order</button>}
+        />
+      </div>
+      {isLoading ? (
+        <div className="text-xs text-muted-foreground">Loading…</div>
+      ) : orders.length === 0 ? (
+        <div className="rounded-lg border border-dashed border-border p-4 text-xs text-muted-foreground text-center">
+          No lab orders yet for this patient.
+        </div>
+      ) : (
+        <ul className="divide-y divide-border rounded-lg border border-border">
+          {orders.slice(0, 6).map((o) => {
+            const critical = o.results.some((r) => r.flag === "critical");
+            const abnormal = o.results.some((r) => ["high", "low", "abnormal"].includes(r.flag));
+            return (
+              <Link
+                key={o.id}
+                to="/labs"
+                className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/40 transition"
+              >
+                <div className={cn(
+                  "size-9 rounded-md flex items-center justify-center",
+                  critical ? "bg-destructive/10 text-destructive" : abnormal ? "bg-warning/15 text-warning" : "bg-primary/10 text-primary",
+                )}>
+                  <FlaskConical className="size-4" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium truncate">
+                    {o.tests.length > 0 ? o.tests.map((t) => t.test_name).slice(0, 2).join(", ") + (o.tests.length > 2 ? "…" : "") : o.order_number}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {formatDate(o.ordered_at)} · {o.status} · {o.results.length} result{o.results.length === 1 ? "" : "s"}
+                    {o.priority === "stat" && " · STAT"}
+                  </div>
+                </div>
+                {critical && <span className="pill pill--danger text-[10px]">Critical</span>}
+                {!critical && abnormal && <span className="pill pill--warning text-[10px]">Abnormal</span>}
+              </Link>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 function formatDateTime(d: string | null | undefined) {
   if (!d) return "—";
   return new Date(d).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" });
@@ -584,6 +642,8 @@ function PatientProfilePage() {
 
           {/* Labs */}
           <SectionCard id="labs" icon={FlaskConical} title="Lab reports" action={<button className="text-xs text-primary font-medium hover:underline">Upload report</button>}>
+            <PatientLabOrders patientId={patient.id} />
+            {labs.length > 0 && <div className="label-eyebrow mt-5 mb-2">Imported reports</div>}
             <ul className="divide-y divide-border rounded-lg border border-border">
               {labs.map((l) => (
                 <li key={l.name + l.date} className="flex items-center gap-4 px-4 py-3 hover:bg-secondary/40 transition">

@@ -227,6 +227,139 @@ export type Database = {
           },
         ]
       }
+      lab_order_tests: {
+        Row: {
+          created_at: string
+          id: string
+          order_id: string
+          test_code: string | null
+          test_name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_id: string
+          test_code?: string | null
+          test_name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_id?: string
+          test_code?: string | null
+          test_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lab_order_tests_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "lab_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lab_orders: {
+        Row: {
+          clinical_notes: string | null
+          collected_at: string | null
+          created_at: string
+          id: string
+          lab_facility: string | null
+          order_number: string
+          ordered_at: string
+          patient_id: string
+          priority: string
+          provider_id: string | null
+          resulted_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          clinical_notes?: string | null
+          collected_at?: string | null
+          created_at?: string
+          id?: string
+          lab_facility?: string | null
+          order_number?: string
+          ordered_at?: string
+          patient_id: string
+          priority?: string
+          provider_id?: string | null
+          resulted_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          clinical_notes?: string | null
+          collected_at?: string | null
+          created_at?: string
+          id?: string
+          lab_facility?: string | null
+          order_number?: string
+          ordered_at?: string
+          patient_id?: string
+          priority?: string
+          provider_id?: string | null
+          resulted_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      lab_results: {
+        Row: {
+          created_at: string
+          flag: string
+          id: string
+          notes: string | null
+          order_id: string
+          patient_id: string
+          reference_range: string | null
+          resulted_at: string
+          test_code: string | null
+          test_name: string
+          unit: string | null
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          flag?: string
+          id?: string
+          notes?: string | null
+          order_id: string
+          patient_id: string
+          reference_range?: string | null
+          resulted_at?: string
+          test_code?: string | null
+          test_name: string
+          unit?: string | null
+          value: string
+        }
+        Update: {
+          created_at?: string
+          flag?: string
+          id?: string
+          notes?: string | null
+          order_id?: string
+          patient_id?: string
+          reference_range?: string | null
+          resulted_at?: string
+          test_code?: string | null
+          test_name?: string
+          unit?: string | null
+          value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lab_results_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "lab_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       patients: {
         Row: {
           address: string | null

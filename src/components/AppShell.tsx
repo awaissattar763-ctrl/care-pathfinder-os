@@ -16,6 +16,7 @@ import {
   Search,
   Bell,
   Lock,
+  FlaskConical,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CopilotProvider, useCopilot } from "@/components/copilot/CopilotContext";
@@ -26,6 +27,7 @@ const nav = [
   { to: "/patients", label: "Patients", icon: Users },
   { to: "/appointments", label: "Appointments", icon: CalendarDays },
   { to: "/prescriptions", label: "Prescriptions", icon: FileText },
+  { to: "/labs", label: "Lab orders", icon: FlaskConical },
   { to: "/symptom-checker", label: "AI Symptom Check", icon: Sparkles },
   { to: "/claims", label: "Insurance Claims", icon: Receipt },
   { to: "/analytics", label: "Revenue", icon: Activity },

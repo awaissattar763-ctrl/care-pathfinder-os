@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SymptomCheckerRouteImport } from './routes/symptom-checker'
 import { Route as PrescriptionsRouteImport } from './routes/prescriptions'
+import { Route as LabsRouteImport } from './routes/labs'
 import { Route as ComplianceRouteImport } from './routes/compliance'
 import { Route as ClaimsRouteImport } from './routes/claims'
 import { Route as AppointmentsRouteImport } from './routes/appointments'
@@ -30,6 +31,11 @@ const SymptomCheckerRoute = SymptomCheckerRouteImport.update({
 const PrescriptionsRoute = PrescriptionsRouteImport.update({
   id: '/prescriptions',
   path: '/prescriptions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LabsRoute = LabsRouteImport.update({
+  id: '/labs',
+  path: '/labs',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComplianceRoute = ComplianceRouteImport.update({
@@ -90,6 +96,7 @@ export interface FileRoutesByFullPath {
   '/appointments': typeof AppointmentsRoute
   '/claims': typeof ClaimsRoute
   '/compliance': typeof ComplianceRoute
+  '/labs': typeof LabsRoute
   '/prescriptions': typeof PrescriptionsRoute
   '/symptom-checker': typeof SymptomCheckerRoute
   '/api/chat': typeof ApiChatRoute
@@ -104,6 +111,7 @@ export interface FileRoutesByTo {
   '/appointments': typeof AppointmentsRoute
   '/claims': typeof ClaimsRoute
   '/compliance': typeof ComplianceRoute
+  '/labs': typeof LabsRoute
   '/prescriptions': typeof PrescriptionsRoute
   '/symptom-checker': typeof SymptomCheckerRoute
   '/api/chat': typeof ApiChatRoute
@@ -119,6 +127,7 @@ export interface FileRoutesById {
   '/appointments': typeof AppointmentsRoute
   '/claims': typeof ClaimsRoute
   '/compliance': typeof ComplianceRoute
+  '/labs': typeof LabsRoute
   '/prescriptions': typeof PrescriptionsRoute
   '/symptom-checker': typeof SymptomCheckerRoute
   '/api/chat': typeof ApiChatRoute
@@ -135,6 +144,7 @@ export interface FileRouteTypes {
     | '/appointments'
     | '/claims'
     | '/compliance'
+    | '/labs'
     | '/prescriptions'
     | '/symptom-checker'
     | '/api/chat'
@@ -149,6 +159,7 @@ export interface FileRouteTypes {
     | '/appointments'
     | '/claims'
     | '/compliance'
+    | '/labs'
     | '/prescriptions'
     | '/symptom-checker'
     | '/api/chat'
@@ -163,6 +174,7 @@ export interface FileRouteTypes {
     | '/appointments'
     | '/claims'
     | '/compliance'
+    | '/labs'
     | '/prescriptions'
     | '/symptom-checker'
     | '/api/chat'
@@ -178,6 +190,7 @@ export interface RootRouteChildren {
   AppointmentsRoute: typeof AppointmentsRoute
   ClaimsRoute: typeof ClaimsRoute
   ComplianceRoute: typeof ComplianceRoute
+  LabsRoute: typeof LabsRoute
   PrescriptionsRoute: typeof PrescriptionsRoute
   SymptomCheckerRoute: typeof SymptomCheckerRoute
   ApiChatRoute: typeof ApiChatRoute
@@ -201,6 +214,13 @@ declare module '@tanstack/react-router' {
       path: '/prescriptions'
       fullPath: '/prescriptions'
       preLoaderRoute: typeof PrescriptionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/labs': {
+      id: '/labs'
+      path: '/labs'
+      fullPath: '/labs'
+      preLoaderRoute: typeof LabsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/compliance': {
@@ -282,6 +302,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppointmentsRoute: AppointmentsRoute,
   ClaimsRoute: ClaimsRoute,
   ComplianceRoute: ComplianceRoute,
+  LabsRoute: LabsRoute,
   PrescriptionsRoute: PrescriptionsRoute,
   SymptomCheckerRoute: SymptomCheckerRoute,
   ApiChatRoute: ApiChatRoute,
@@ -293,13 +314,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
