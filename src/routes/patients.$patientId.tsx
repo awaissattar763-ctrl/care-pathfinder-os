@@ -584,6 +584,8 @@ function PatientProfilePage() {
 
           {/* Labs */}
           <SectionCard id="labs" icon={FlaskConical} title="Lab reports" action={<button className="text-xs text-primary font-medium hover:underline">Upload report</button>}>
+            <PatientLabOrders patientId={patient.id} />
+            {labs.length > 0 && <div className="label-eyebrow mt-5 mb-2">Imported reports</div>}
             <ul className="divide-y divide-border rounded-lg border border-border">
               {labs.map((l) => (
                 <li key={l.name + l.date} className="flex items-center gap-4 px-4 py-3 hover:bg-secondary/40 transition">
