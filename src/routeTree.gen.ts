@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SymptomCheckerRouteImport } from './routes/symptom-checker'
 import { Route as PrescriptionsRouteImport } from './routes/prescriptions'
+import { Route as PortalRouteImport } from './routes/portal'
 import { Route as LabsRouteImport } from './routes/labs'
 import { Route as ComplianceRouteImport } from './routes/compliance'
 import { Route as ClaimsRouteImport } from './routes/claims'
@@ -18,10 +19,18 @@ import { Route as AppointmentsRouteImport } from './routes/appointments'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TelemedicineIndexRouteImport } from './routes/telemedicine.index'
+import { Route as PortalIndexRouteImport } from './routes/portal.index'
 import { Route as PatientsIndexRouteImport } from './routes/patients.index'
 import { Route as TelemedicineAppointmentIdRouteImport } from './routes/telemedicine.$appointmentId'
+import { Route as PortalProfileRouteImport } from './routes/portal.profile'
+import { Route as PortalPrescriptionsRouteImport } from './routes/portal.prescriptions'
+import { Route as PortalMessagesRouteImport } from './routes/portal.messages'
+import { Route as PortalLabsRouteImport } from './routes/portal.labs'
+import { Route as PortalAppointmentsRouteImport } from './routes/portal.appointments'
 import { Route as PatientsPatientIdRouteImport } from './routes/patients.$patientId'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminSchedulesRouteImport } from './routes/admin.schedules'
 
 const SymptomCheckerRoute = SymptomCheckerRouteImport.update({
   id: '/symptom-checker',
@@ -31,6 +40,11 @@ const SymptomCheckerRoute = SymptomCheckerRouteImport.update({
 const PrescriptionsRoute = PrescriptionsRouteImport.update({
   id: '/prescriptions',
   path: '/prescriptions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalRoute = PortalRouteImport.update({
+  id: '/portal',
+  path: '/portal',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LabsRoute = LabsRouteImport.update({
@@ -68,6 +82,11 @@ const TelemedicineIndexRoute = TelemedicineIndexRouteImport.update({
   path: '/telemedicine/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PortalIndexRoute = PortalIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PortalRoute,
+} as any)
 const PatientsIndexRoute = PatientsIndexRouteImport.update({
   id: '/patients/',
   path: '/patients/',
@@ -79,6 +98,31 @@ const TelemedicineAppointmentIdRoute =
     path: '/telemedicine/$appointmentId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const PortalProfileRoute = PortalProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalPrescriptionsRoute = PortalPrescriptionsRouteImport.update({
+  id: '/prescriptions',
+  path: '/prescriptions',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalMessagesRoute = PortalMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalLabsRoute = PortalLabsRouteImport.update({
+  id: '/labs',
+  path: '/labs',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalAppointmentsRoute = PortalAppointmentsRouteImport.update({
+  id: '/appointments',
+  path: '/appointments',
+  getParentRoute: () => PortalRoute,
+} as any)
 const PatientsPatientIdRoute = PatientsPatientIdRouteImport.update({
   id: '/patients/$patientId',
   path: '/patients/$patientId',
@@ -89,6 +133,16 @@ const ApiChatRoute = ApiChatRouteImport.update({
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/admin/users',
+  path: '/admin/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminSchedulesRoute = AdminSchedulesRouteImport.update({
+  id: '/admin/schedules',
+  path: '/admin/schedules',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -97,12 +151,21 @@ export interface FileRoutesByFullPath {
   '/claims': typeof ClaimsRoute
   '/compliance': typeof ComplianceRoute
   '/labs': typeof LabsRoute
+  '/portal': typeof PortalRouteWithChildren
   '/prescriptions': typeof PrescriptionsRoute
   '/symptom-checker': typeof SymptomCheckerRoute
+  '/admin/schedules': typeof AdminSchedulesRoute
+  '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
   '/patients/$patientId': typeof PatientsPatientIdRoute
+  '/portal/appointments': typeof PortalAppointmentsRoute
+  '/portal/labs': typeof PortalLabsRoute
+  '/portal/messages': typeof PortalMessagesRoute
+  '/portal/prescriptions': typeof PortalPrescriptionsRoute
+  '/portal/profile': typeof PortalProfileRoute
   '/telemedicine/$appointmentId': typeof TelemedicineAppointmentIdRoute
   '/patients/': typeof PatientsIndexRoute
+  '/portal/': typeof PortalIndexRoute
   '/telemedicine/': typeof TelemedicineIndexRoute
 }
 export interface FileRoutesByTo {
@@ -114,10 +177,18 @@ export interface FileRoutesByTo {
   '/labs': typeof LabsRoute
   '/prescriptions': typeof PrescriptionsRoute
   '/symptom-checker': typeof SymptomCheckerRoute
+  '/admin/schedules': typeof AdminSchedulesRoute
+  '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
   '/patients/$patientId': typeof PatientsPatientIdRoute
+  '/portal/appointments': typeof PortalAppointmentsRoute
+  '/portal/labs': typeof PortalLabsRoute
+  '/portal/messages': typeof PortalMessagesRoute
+  '/portal/prescriptions': typeof PortalPrescriptionsRoute
+  '/portal/profile': typeof PortalProfileRoute
   '/telemedicine/$appointmentId': typeof TelemedicineAppointmentIdRoute
   '/patients': typeof PatientsIndexRoute
+  '/portal': typeof PortalIndexRoute
   '/telemedicine': typeof TelemedicineIndexRoute
 }
 export interface FileRoutesById {
@@ -128,12 +199,21 @@ export interface FileRoutesById {
   '/claims': typeof ClaimsRoute
   '/compliance': typeof ComplianceRoute
   '/labs': typeof LabsRoute
+  '/portal': typeof PortalRouteWithChildren
   '/prescriptions': typeof PrescriptionsRoute
   '/symptom-checker': typeof SymptomCheckerRoute
+  '/admin/schedules': typeof AdminSchedulesRoute
+  '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
   '/patients/$patientId': typeof PatientsPatientIdRoute
+  '/portal/appointments': typeof PortalAppointmentsRoute
+  '/portal/labs': typeof PortalLabsRoute
+  '/portal/messages': typeof PortalMessagesRoute
+  '/portal/prescriptions': typeof PortalPrescriptionsRoute
+  '/portal/profile': typeof PortalProfileRoute
   '/telemedicine/$appointmentId': typeof TelemedicineAppointmentIdRoute
   '/patients/': typeof PatientsIndexRoute
+  '/portal/': typeof PortalIndexRoute
   '/telemedicine/': typeof TelemedicineIndexRoute
 }
 export interface FileRouteTypes {
@@ -145,12 +225,21 @@ export interface FileRouteTypes {
     | '/claims'
     | '/compliance'
     | '/labs'
+    | '/portal'
     | '/prescriptions'
     | '/symptom-checker'
+    | '/admin/schedules'
+    | '/admin/users'
     | '/api/chat'
     | '/patients/$patientId'
+    | '/portal/appointments'
+    | '/portal/labs'
+    | '/portal/messages'
+    | '/portal/prescriptions'
+    | '/portal/profile'
     | '/telemedicine/$appointmentId'
     | '/patients/'
+    | '/portal/'
     | '/telemedicine/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -162,10 +251,18 @@ export interface FileRouteTypes {
     | '/labs'
     | '/prescriptions'
     | '/symptom-checker'
+    | '/admin/schedules'
+    | '/admin/users'
     | '/api/chat'
     | '/patients/$patientId'
+    | '/portal/appointments'
+    | '/portal/labs'
+    | '/portal/messages'
+    | '/portal/prescriptions'
+    | '/portal/profile'
     | '/telemedicine/$appointmentId'
     | '/patients'
+    | '/portal'
     | '/telemedicine'
   id:
     | '__root__'
@@ -175,12 +272,21 @@ export interface FileRouteTypes {
     | '/claims'
     | '/compliance'
     | '/labs'
+    | '/portal'
     | '/prescriptions'
     | '/symptom-checker'
+    | '/admin/schedules'
+    | '/admin/users'
     | '/api/chat'
     | '/patients/$patientId'
+    | '/portal/appointments'
+    | '/portal/labs'
+    | '/portal/messages'
+    | '/portal/prescriptions'
+    | '/portal/profile'
     | '/telemedicine/$appointmentId'
     | '/patients/'
+    | '/portal/'
     | '/telemedicine/'
   fileRoutesById: FileRoutesById
 }
@@ -191,8 +297,11 @@ export interface RootRouteChildren {
   ClaimsRoute: typeof ClaimsRoute
   ComplianceRoute: typeof ComplianceRoute
   LabsRoute: typeof LabsRoute
+  PortalRoute: typeof PortalRouteWithChildren
   PrescriptionsRoute: typeof PrescriptionsRoute
   SymptomCheckerRoute: typeof SymptomCheckerRoute
+  AdminSchedulesRoute: typeof AdminSchedulesRoute
+  AdminUsersRoute: typeof AdminUsersRoute
   ApiChatRoute: typeof ApiChatRoute
   PatientsPatientIdRoute: typeof PatientsPatientIdRoute
   TelemedicineAppointmentIdRoute: typeof TelemedicineAppointmentIdRoute
@@ -214,6 +323,13 @@ declare module '@tanstack/react-router' {
       path: '/prescriptions'
       fullPath: '/prescriptions'
       preLoaderRoute: typeof PrescriptionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal': {
+      id: '/portal'
+      path: '/portal'
+      fullPath: '/portal'
+      preLoaderRoute: typeof PortalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/labs': {
@@ -265,6 +381,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TelemedicineIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/portal/': {
+      id: '/portal/'
+      path: '/'
+      fullPath: '/portal/'
+      preLoaderRoute: typeof PortalIndexRouteImport
+      parentRoute: typeof PortalRoute
+    }
     '/patients/': {
       id: '/patients/'
       path: '/patients'
@@ -278,6 +401,41 @@ declare module '@tanstack/react-router' {
       fullPath: '/telemedicine/$appointmentId'
       preLoaderRoute: typeof TelemedicineAppointmentIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/portal/profile': {
+      id: '/portal/profile'
+      path: '/profile'
+      fullPath: '/portal/profile'
+      preLoaderRoute: typeof PortalProfileRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/prescriptions': {
+      id: '/portal/prescriptions'
+      path: '/prescriptions'
+      fullPath: '/portal/prescriptions'
+      preLoaderRoute: typeof PortalPrescriptionsRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/messages': {
+      id: '/portal/messages'
+      path: '/messages'
+      fullPath: '/portal/messages'
+      preLoaderRoute: typeof PortalMessagesRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/labs': {
+      id: '/portal/labs'
+      path: '/labs'
+      fullPath: '/portal/labs'
+      preLoaderRoute: typeof PortalLabsRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/appointments': {
+      id: '/portal/appointments'
+      path: '/appointments'
+      fullPath: '/portal/appointments'
+      preLoaderRoute: typeof PortalAppointmentsRouteImport
+      parentRoute: typeof PortalRoute
     }
     '/patients/$patientId': {
       id: '/patients/$patientId'
@@ -293,8 +451,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/admin/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/schedules': {
+      id: '/admin/schedules'
+      path: '/admin/schedules'
+      fullPath: '/admin/schedules'
+      preLoaderRoute: typeof AdminSchedulesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
+
+interface PortalRouteChildren {
+  PortalAppointmentsRoute: typeof PortalAppointmentsRoute
+  PortalLabsRoute: typeof PortalLabsRoute
+  PortalMessagesRoute: typeof PortalMessagesRoute
+  PortalPrescriptionsRoute: typeof PortalPrescriptionsRoute
+  PortalProfileRoute: typeof PortalProfileRoute
+  PortalIndexRoute: typeof PortalIndexRoute
+}
+
+const PortalRouteChildren: PortalRouteChildren = {
+  PortalAppointmentsRoute: PortalAppointmentsRoute,
+  PortalLabsRoute: PortalLabsRoute,
+  PortalMessagesRoute: PortalMessagesRoute,
+  PortalPrescriptionsRoute: PortalPrescriptionsRoute,
+  PortalProfileRoute: PortalProfileRoute,
+  PortalIndexRoute: PortalIndexRoute,
+}
+
+const PortalRouteWithChildren =
+  PortalRoute._addFileChildren(PortalRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -303,8 +496,11 @@ const rootRouteChildren: RootRouteChildren = {
   ClaimsRoute: ClaimsRoute,
   ComplianceRoute: ComplianceRoute,
   LabsRoute: LabsRoute,
+  PortalRoute: PortalRouteWithChildren,
   PrescriptionsRoute: PrescriptionsRoute,
   SymptomCheckerRoute: SymptomCheckerRoute,
+  AdminSchedulesRoute: AdminSchedulesRoute,
+  AdminUsersRoute: AdminUsersRoute,
   ApiChatRoute: ApiChatRoute,
   PatientsPatientIdRoute: PatientsPatientIdRoute,
   TelemedicineAppointmentIdRoute: TelemedicineAppointmentIdRoute,
@@ -314,3 +510,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
