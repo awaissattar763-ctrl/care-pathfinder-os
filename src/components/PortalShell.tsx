@@ -54,7 +54,7 @@ export function PortalShell() {
               const Icon = item.icon;
               const active = isActive(item);
               return (
-                <Link key={item.to} to={item.to}
+                <Link key={item.to} to={item.to as never}
                   className={cn(
                     "flex items-center gap-2 px-3 py-2.5 text-sm border-b-2 transition-colors",
                     active ? "border-primary text-foreground font-medium" : "border-transparent text-muted-foreground hover:text-foreground"
@@ -82,7 +82,7 @@ export function PortalShell() {
             const Icon = item.icon;
             const active = isActive(item);
             return (
-              <Link key={item.to} to={item.to}
+              <Link key={item.to} to={item.to as never}
                 className={cn(
                   "flex flex-col items-center gap-0.5 py-2 text-[10px]",
                   active ? "text-primary font-medium" : "text-muted-foreground"
