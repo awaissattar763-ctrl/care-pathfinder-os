@@ -89,7 +89,7 @@ export function AppShell() {
               return (
                 <Link
                   key={item.to}
-                  to={item.to}
+                  to={item.to as never}
                   title={item.label}
                   aria-current={active ? "page" : undefined}
                   className={cn(
