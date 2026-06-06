@@ -2,6 +2,7 @@ import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 
 import { useAuth } from "@/hooks/use-auth";
+import { usePermissions } from "@/lib/rbac";
 import { LogOut } from "lucide-react";
 import {
   LayoutDashboard,
@@ -17,28 +18,35 @@ import {
   Bell,
   Lock,
   FlaskConical,
+  UserCog,
+  CalendarClock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CopilotProvider, useCopilot } from "@/components/copilot/CopilotContext";
 import { AICopilot, CopilotLauncher } from "@/components/copilot/AICopilot";
 
-const nav = [
+type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; perm?: string };
+const NAV: NavItem[] = [
   { to: "/", label: "Overview", icon: LayoutDashboard },
-  { to: "/patients", label: "Patients", icon: Users },
-  { to: "/appointments", label: "Appointments", icon: CalendarDays },
-  { to: "/prescriptions", label: "Prescriptions", icon: FileText },
-  { to: "/labs", label: "Lab orders", icon: FlaskConical },
+  { to: "/patients", label: "Patients", icon: Users, perm: "patients.read" },
+  { to: "/appointments", label: "Appointments", icon: CalendarDays, perm: "appointments.read" },
+  { to: "/prescriptions", label: "Prescriptions", icon: FileText, perm: "prescriptions.read" },
+  { to: "/labs", label: "Lab orders", icon: FlaskConical, perm: "labs.read" },
   { to: "/symptom-checker", label: "AI Symptom Check", icon: Sparkles },
-  { to: "/claims", label: "Insurance Claims", icon: Receipt },
+  { to: "/claims", label: "Insurance Claims", icon: Receipt, perm: "claims.read" },
   { to: "/analytics", label: "Revenue", icon: Activity },
-  { to: "/telemedicine", label: "Telemedicine", icon: Video },
-  { to: "/compliance", label: "Compliance", icon: ShieldCheck },
-] as const;
+  { to: "/telemedicine", label: "Telemedicine", icon: Video, perm: "telemedicine.provider" },
+  { to: "/compliance", label: "Compliance", icon: ShieldCheck, perm: "compliance.read" },
+  { to: "/admin/users", label: "Users & Roles", icon: UserCog, perm: "admin.users" },
+  { to: "/admin/schedules", label: "Schedules", icon: CalendarClock, perm: "admin.schedules" },
+];
 
 export function AppShell() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const searchRef = useRef<HTMLInputElement>(null);
   const [showHelp, setShowHelp] = useState(false);
+  const perms = usePermissions();
+  const nav = NAV.filter((n) => !n.perm || perms.has(n.perm as never));
 
   // Global keyboard shortcuts: "/" focus search, "?" toggle help, Esc closes help
   useEffect(() => {
