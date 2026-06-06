@@ -3,20 +3,21 @@ import { Activity, CalendarDays, FlaskConical, FileText, MessageSquare, User, Lo
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 
-const nav = [
+type NavItem = { to: string; label: string; icon: typeof Home; exact?: boolean };
+const nav: NavItem[] = [
   { to: "/portal", label: "Home", icon: Home, exact: true },
   { to: "/portal/appointments", label: "Visits", icon: CalendarDays },
   { to: "/portal/labs", label: "Labs", icon: FlaskConical },
   { to: "/portal/prescriptions", label: "Rx", icon: FileText },
   { to: "/portal/messages", label: "Messages", icon: MessageSquare },
   { to: "/portal/profile", label: "Profile", icon: User },
-] as const;
+];
 
 export function PortalShell() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { user, signOut } = useAuth();
 
-  const isActive = (item: typeof nav[number]) =>
+  const isActive = (item: NavItem) =>
     item.exact ? pathname === item.to : pathname.startsWith(item.to);
 
   return (
