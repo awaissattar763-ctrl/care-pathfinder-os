@@ -13,6 +13,9 @@ import { AppShell } from "@/components/AppShell";
 import { AuthProvider } from "@/hooks/use-auth";
 import { AuthGate } from "@/components/AuthGate";
 import { Toaster } from "@/components/ui/sonner";
+import { useRouterState, useNavigate } from "@tanstack/react-router";
+import { useAuth } from "@/hooks/use-auth";
+import { useEffect } from "react";
 
 function NotFoundComponent() {
   return (
@@ -123,10 +126,29 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <AuthGate>
-          <AppShell />
+          <ShellSwitcher />
         </AuthGate>
         <Toaster richColors closeButton position="bottom-right" />
       </AuthProvider>
     </QueryClientProvider>
   );
+}
+
+function ShellSwitcher() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { roles, loading } = useAuth();
+  const navigate = useNavigate();
+
+  const isPortalRoute = pathname.startsWith("/portal");
+  const isPatientOnly = !loading && roles.length > 0 && roles.every((r) => r === "patient");
+
+  // Auto-redirect patient-only users to portal
+  useEffect(() => {
+    if (isPatientOnly && !isPortalRoute) {
+      navigate({ to: "/portal" as never, replace: true });
+    }
+  }, [isPatientOnly, isPortalRoute, navigate]);
+
+  if (isPortalRoute) return <Outlet />;
+  return <AppShell />;
 }
