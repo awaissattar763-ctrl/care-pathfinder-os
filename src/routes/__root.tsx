@@ -13,10 +13,9 @@ import { AppShell } from "@/components/AppShell";
 import { AuthProvider } from "@/hooks/use-auth";
 import { AuthGate } from "@/components/AuthGate";
 import { Toaster } from "@/components/ui/sonner";
-import { useRouterState, Outlet as OutletComp } from "@tanstack/react-router";
+import { useRouterState, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import { useEffect } from "react";
-import { useNavigate } from "@tanstack/react-router";
 
 function NotFoundComponent() {
   return (
@@ -150,6 +149,6 @@ function ShellSwitcher() {
     }
   }, [isPatientOnly, isPortalRoute, navigate]);
 
-  if (isPortalRoute) return <OutletComp />;
+  if (isPortalRoute) return <Outlet />;
   return <AppShell />;
 }
