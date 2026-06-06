@@ -189,6 +189,33 @@ export type Database = {
           },
         ]
       }
+      conversations: {
+        Row: {
+          created_at: string
+          id: string
+          last_message_at: string
+          patient_id: string
+          provider_id: string | null
+          subject: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          patient_id: string
+          provider_id?: string | null
+          subject?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          patient_id?: string
+          provider_id?: string | null
+          subject?: string
+        }
+        Relationships: []
+      }
       documents: {
         Row: {
           date: string | null
@@ -359,6 +386,60 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      messages: {
+        Row: {
+          attachments: Json
+          body: string
+          conversation_id: string
+          created_at: string
+          id: string
+          read_at: string | null
+          sender_role: string
+          sender_user_id: string
+        }
+        Insert: {
+          attachments?: Json
+          body: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          sender_role: string
+          sender_user_id: string
+        }
+        Update: {
+          attachments?: Json
+          body?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          sender_role?: string
+          sender_user_id?: string
+        }
+        Relationships: []
+      }
+      patient_users: {
+        Row: {
+          created_at: string
+          id: string
+          patient_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          patient_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          patient_id?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       patients: {
         Row: {
@@ -658,6 +739,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_sessions_log: {
+        Row: {
+          created_at: string
+          event: string
+          id: string
+          ip: string | null
+          metadata: Json
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event: string
+          id?: string
+          ip?: string | null
+          metadata?: Json
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event?: string
+          id?: string
+          ip?: string | null
+          metadata?: Json
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       vitals: {
         Row: {
           created_at: string
@@ -755,6 +866,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      current_patient_id: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -762,6 +874,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_staff: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role:
