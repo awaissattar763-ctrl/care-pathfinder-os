@@ -111,11 +111,17 @@ export function useConversations(patientId?: string | null) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("conversations")
-        .select("*, patient:patients(id,name,mrn), provider:providers(id,name,specialty)")
+        .select("*")
         .eq("patient_id", pid!)
         .order("last_message_at", { ascending: false });
       if (error) throw error;
-      return data ?? [];
+      const rows = data ?? [];
+      const providerIds = Array.from(new Set(rows.map((r) => r.provider_id).filter(Boolean) as string[]));
+      const providers = providerIds.length
+        ? (await supabase.from("providers").select("id,name,specialty").in("id", providerIds)).data ?? []
+        : [];
+      const pmap = new Map(providers.map((p) => [p.id, p]));
+      return rows.map((r) => ({ ...r, provider: r.provider_id ? pmap.get(r.provider_id) ?? null : null }));
     },
   });
 }
@@ -126,10 +132,23 @@ export function useAllConversations() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("conversations")
-        .select("*, patient:patients(id,name,mrn), provider:providers(id,name,specialty)")
+        .select("*")
         .order("last_message_at", { ascending: false });
       if (error) throw error;
-      return data ?? [];
+      const rows = data ?? [];
+      const patientIds = Array.from(new Set(rows.map((r) => r.patient_id)));
+      const providerIds = Array.from(new Set(rows.map((r) => r.provider_id).filter(Boolean) as string[]));
+      const [patients, providers] = await Promise.all([
+        patientIds.length ? supabase.from("patients").select("id,name,mrn").in("id", patientIds) : Promise.resolve({ data: [] as { id: string; name: string; mrn: string }[] }),
+        providerIds.length ? supabase.from("providers").select("id,name,specialty").in("id", providerIds) : Promise.resolve({ data: [] as { id: string; name: string; specialty: string | null }[] }),
+      ]);
+      const pmap = new Map((patients.data ?? []).map((p) => [p.id, p]));
+      const prmap = new Map((providers.data ?? []).map((p) => [p.id, p]));
+      return rows.map((r) => ({
+        ...r,
+        patient: pmap.get(r.patient_id) ?? null,
+        provider: r.provider_id ? prmap.get(r.provider_id) ?? null : null,
+      }));
     },
   });
 }
@@ -268,11 +287,17 @@ export function useProviderSchedules(providerId?: string) {
   return useQuery({
     queryKey: ["provider-schedules", providerId],
     queryFn: async () => {
-      let q = supabase.from("provider_schedules").select("*, provider:providers(id,name)").order("created_at", { ascending: false });
+      let q = supabase.from("provider_schedules").select("*").order("created_at", { ascending: false });
       if (providerId) q = q.eq("provider_id", providerId);
       const { data, error } = await q;
       if (error) throw error;
-      return data ?? [];
+      const rows = data ?? [];
+      const providerIds = Array.from(new Set(rows.map((r) => r.provider_id)));
+      const providers = providerIds.length
+        ? (await supabase.from("providers").select("id,name").in("id", providerIds)).data ?? []
+        : [];
+      const pmap = new Map(providers.map((p) => [p.id, p]));
+      return rows.map((r) => ({ ...r, provider: pmap.get(r.provider_id) ?? null }));
     },
   });
 }
