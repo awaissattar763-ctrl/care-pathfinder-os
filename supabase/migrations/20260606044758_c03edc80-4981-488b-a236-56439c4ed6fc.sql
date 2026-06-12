@@ -1,0 +1,3 @@
+
+ALTER TYPE public.app_role ADD VALUE IF NOT EXISTS 'lab_tech';
+ALTER TYPE public.app_role ADD VALUE IF NOT EXISTS 'patient';
