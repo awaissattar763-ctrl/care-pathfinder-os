@@ -1,8 +1,9 @@
 import { cn } from "@/lib/utils";
 
-export type Urgency = "urgent" | "routine" | "stable";
+export type Urgency = "critical" | "urgent" | "routine" | "stable";
 
 const styles: Record<Urgency, { dot: string; bg: string; text: string; label: string }> = {
+  critical: { dot: "bg-destructive", bg: "bg-destructive/15", text: "text-destructive", label: "Critical" },
   urgent: { dot: "bg-destructive", bg: "bg-destructive/10", text: "text-destructive", label: "Urgent" },
   routine: { dot: "bg-warning", bg: "bg-warning/15", text: "text-warning", label: "Routine" },
   stable: { dot: "bg-success", bg: "bg-success/10", text: "text-success", label: "Stable" },
