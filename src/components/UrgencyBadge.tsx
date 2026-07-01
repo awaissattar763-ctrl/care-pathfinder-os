@@ -9,7 +9,7 @@ const styles: Record<Urgency, { dot: string; bg: string; text: string; label: st
 };
 
 export function UrgencyBadge({ level, children, className }: { level: Urgency; children?: React.ReactNode; className?: string }) {
-  const s = styles[level];
+  const s = styles[level] ?? styles.routine;
   return (
     <span className={cn("inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[11px] font-medium", s.bg, s.text, className)}>
       <span className={cn("size-1.5 rounded-full", s.dot)} aria-hidden />
