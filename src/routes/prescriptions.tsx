@@ -5,8 +5,6 @@ import { usePrescriptions } from "@/hooks/queries";
 import { NewPrescriptionDialog } from "@/components/dialogs/NewPrescriptionDialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/EmptyState";
-import { GuardedAction, Can } from "@/components/rbac/Can";
-import { QueryErrorState } from "@/components/QueryErrorState";
 
 export const Route = createFileRoute("/prescriptions")({ component: PrescriptionsPage });
 
@@ -17,7 +15,7 @@ const pillTone: Record<string, string> = {
 };
 
 function PrescriptionsPage() {
-  const { data: rxList, isLoading, isError, refetch } = usePrescriptions();
+  const { data: rxList, isLoading } = usePrescriptions();
   const preview = rxList?.[0];
 
   return (
@@ -28,17 +26,8 @@ function PrescriptionsPage() {
         description="Compose, e-sign, and dispatch prescriptions via Surescripts."
         actions={
           <>
-            <Can perm="prescriptions.write">
-              <button className="btn btn-secondary">Templates</button>
-            </Can>
-            <GuardedAction
-              perm="prescriptions.write"
-              action="prescriptions.create"
-              label="New prescription"
-              icon={<Plus className="size-4" />}
-            >
-              <NewPrescriptionDialog trigger={<button className="btn btn-primary"><Plus className="size-4" /> New prescription</button>} />
-            </GuardedAction>
+            <button className="btn btn-secondary">Templates</button>
+            <NewPrescriptionDialog trigger={<button className="btn btn-primary"><Plus className="size-4" /> New prescription</button>} />
           </>
         }
       />
@@ -52,20 +41,14 @@ function PrescriptionsPage() {
             </div>
             <button className="btn btn-ghost btn-sm">View all</button>
           </div>
-          {isError ? (
-            <QueryErrorState onRetry={() => refetch()} />
-          ) : isLoading ? (
+          {isLoading ? (
             <div className="p-5 space-y-3">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}</div>
           ) : !rxList || rxList.length === 0 ? (
             <EmptyState
               icon={Pill}
               title="No prescriptions yet"
               description="Compose your first prescription to dispatch via Surescripts."
-              action={
-                <Can perm="prescriptions.write">
-                  <NewPrescriptionDialog trigger={<button className="btn btn-primary"><Plus className="size-4" /> New prescription</button>} />
-                </Can>
-              }
+              action={<NewPrescriptionDialog trigger={<button className="btn btn-primary"><Plus className="size-4" /> New prescription</button>} />}
             />
           ) : (
             <ul className="divide-y divide-border">

@@ -1,12 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMyAppointments } from "@/hooks/portal-queries";
 import { CalendarDays, Video } from "lucide-react";
-import { QueryErrorState } from "@/components/QueryErrorState";
 
 export const Route = createFileRoute("/portal/appointments")({ component: PortalAppts });
 
 function PortalAppts() {
-  const { data, isLoading, isError, refetch } = useMyAppointments();
+  const { data, isLoading } = useMyAppointments();
   const now = Date.now();
   const upcoming = (data ?? []).filter((a) => new Date(a.scheduled_at).getTime() >= now);
   const past = (data ?? []).filter((a) => new Date(a.scheduled_at).getTime() < now);
@@ -14,7 +13,7 @@ function PortalAppts() {
   return (
     <div className="space-y-5">
       <h1 className="text-xl font-semibold tracking-tight flex items-center gap-2"><CalendarDays className="size-5 text-primary" /> My visits</h1>
-      {isError ? <QueryErrorState compact title="Couldn't load your visits" onRetry={() => refetch()} /> : isLoading ? <div className="text-sm text-muted-foreground">Loading…</div> : null}
+      {isLoading ? <div className="text-sm text-muted-foreground">Loading…</div> : null}
       <Section title="Upcoming" items={upcoming} empty="No upcoming visits." />
       <Section title="Past" items={past} empty="No past visits." />
     </div>

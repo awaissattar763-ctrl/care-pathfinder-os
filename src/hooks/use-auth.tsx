@@ -10,8 +10,6 @@ type AuthCtx = {
   user: User | null;
   roles: AppRole[];
   loading: boolean;
-  /** true until the user's roles have been fetched at least once */
-  rolesLoading: boolean;
   signOut: () => Promise<void>;
 };
 
@@ -20,7 +18,6 @@ const Ctx = createContext<AuthCtx>({
   user: null,
   roles: [],
   loading: true,
-  rolesLoading: true,
   signOut: async () => {},
 });
 
@@ -28,7 +25,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [roles, setRoles] = useState<AppRole[]>([]);
   const [loading, setLoading] = useState(true);
-  const [rolesLoading, setRolesLoading] = useState(true);
   const qc = useQueryClient();
 
   useEffect(() => {
@@ -40,12 +36,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setTimeout(() => {
           supabase.from("user_roles").select("role").eq("user_id", s.user.id).then(({ data }) => {
             setRoles((data?.map((r) => r.role as AppRole)) ?? []);
-            setRolesLoading(false);
           });
         }, 0);
       } else {
         setRoles([]);
-        setRolesLoading(false);
       }
     });
     supabase.auth.getSession().then(({ data }) => {
@@ -54,10 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (data.session?.user) {
         supabase.from("user_roles").select("role").eq("user_id", data.session.user.id).then(({ data: r }) => {
           setRoles((r?.map((x) => x.role as AppRole)) ?? []);
-          setRolesLoading(false);
         });
-      } else {
-        setRolesLoading(false);
       }
     });
     return () => subscription.unsubscribe();
@@ -70,7 +61,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user: session?.user ?? null,
         roles,
         loading,
-        rolesLoading,
         signOut: async () => { await supabase.auth.signOut(); },
       }}
     >

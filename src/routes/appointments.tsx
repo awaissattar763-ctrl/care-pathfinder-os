@@ -11,7 +11,6 @@ import {
   type AppointmentWithRefs,
 } from "@/hooks/queries";
 import { NewAppointmentDialog } from "@/components/dialogs/NewAppointmentDialog";
-import { GuardedAction, Can } from "@/components/rbac/Can";
 import { WaitlistDrawer } from "@/components/appointments/WaitlistDrawer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/EmptyState";
@@ -22,7 +21,6 @@ import {
   statusDot,
   statusEventClasses,
 } from "@/components/appointments/AppointmentDetailDrawer";
-import { QueryErrorState } from "@/components/QueryErrorState";
 
 export const Route = createFileRoute("/appointments")({ component: AppointmentsPage });
 
@@ -35,7 +33,7 @@ function addDays(d: Date, n: number) { const x = new Date(d); x.setDate(x.getDat
 function sameDay(a: Date, b: Date) { return a.toDateString() === b.toDateString(); }
 
 function AppointmentsPage() {
-  const { data, isLoading, isError, refetch } = useAppointments();
+  const { data, isLoading } = useAppointments();
   const { data: providers } = useProviders();
   const { data: rooms } = useRooms();
   const update = useUpdateAppointment();
@@ -122,14 +120,7 @@ function AppointmentsPage() {
             <button className="btn btn-secondary" onClick={() => setWaitlistOpen(true)}>
               <ListChecks className="size-4" /> Waitlist
             </button>
-            <GuardedAction
-              perm="appointments.write"
-              action="appointments.book"
-              label="Book"
-              icon={<Plus className="size-4" />}
-            >
-              <NewAppointmentDialog trigger={<button className="btn btn-primary"><Plus className="size-4" /> Book</button>} />
-            </GuardedAction>
+            <NewAppointmentDialog trigger={<button className="btn btn-primary"><Plus className="size-4" /> Book</button>} />
           </>
         }
       />
@@ -165,20 +156,14 @@ function AppointmentsPage() {
       </div>
 
       <div className="surface overflow-hidden">
-        {isError ? (
-            <QueryErrorState onRetry={() => refetch()} />
-          ) : isLoading ? (
+        {isLoading ? (
           <div className="p-6 space-y-3">{[...Array(6)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}</div>
         ) : !data || data.length === 0 ? (
           <EmptyState
             icon={CalendarDays}
             title="Nothing on the books"
             description="Schedule your first appointment to see the clinic flow."
-            action={
-              <Can perm="appointments.write">
-                <NewAppointmentDialog trigger={<button className="btn btn-primary"><Plus className="size-4" /> Book appointment</button>} />
-              </Can>
-            }
+            action={<NewAppointmentDialog trigger={<button className="btn btn-primary"><Plus className="size-4" /> Book appointment</button>} />}
           />
         ) : view === "month" ? (
           <MonthView cursor={cursor} appts={appts} onSelect={setSelected} onDropTo={onDropTo} onQuickCreate={openQuickCreate} />

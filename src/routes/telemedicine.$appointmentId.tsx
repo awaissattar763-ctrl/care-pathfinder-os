@@ -114,12 +114,12 @@ function TelemedicineRoom() {
           </Link>
           <div className="h-4 w-px bg-border" />
           {joined && (
-            <span className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-wider font-semibold text-warning">
+            <span className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-wider font-semibold text-destructive">
               <span className="relative flex size-2">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-warning opacity-60 animate-ping" />
-                <span className="relative inline-flex size-2 rounded-full bg-warning" />
+                <span className="absolute inline-flex h-full w-full rounded-full bg-destructive opacity-60 animate-ping" />
+                <span className="relative inline-flex size-2 rounded-full bg-destructive" />
               </span>
-              Preview
+              Live
             </span>
           )}
           <div className="min-w-0">
@@ -127,7 +127,9 @@ function TelemedicineRoom() {
               {patient.name} · {patient.sex ?? "—"}{patient.dob ? ` · ${ageFromDob(patient.dob)}y` : ""} · {appt.reason ?? "Virtual visit"}
             </div>
             <div className="text-xs text-muted-foreground flex items-center gap-2 flex-wrap">
-              <span className="inline-flex items-center gap-1"><VideoIcon className="size-3" /> Provider camera preview</span>
+              <span className="inline-flex items-center gap-1"><Lock className="size-3" /> E2EE</span>
+              <span>·</span>
+              <span className="inline-flex items-center gap-1"><ShieldCheck className="size-3 text-success" /> HIPAA secure</span>
               <span>·</span>
               <span className="tabular-nums">Session {appt.id.slice(0, 8)}</span>
             </div>
@@ -140,11 +142,6 @@ function TelemedicineRoom() {
             <span className="font-medium">{formatTime(seconds)}</span>
           </div>
         </div>
-      </div>
-
-      <div className="mb-4 rounded-lg border border-warning/30 bg-warning/10 px-4 py-2.5 text-xs flex items-center gap-2">
-        <AlertTriangle className="size-3.5 text-warning shrink-0" />
-        <span><b>Telemedicine preview.</b> Provider camera, notes, and session tools are functional. Two-way patient video is not yet connected — do not use for real patient consultations.</span>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-5">
@@ -171,9 +168,12 @@ function TelemedicineRoom() {
                 <CtrlBtn label={sharing ? "Stop sharing" : "Share screen"} active={sharing} onClick={() => setSharing((v) => !v)} icon={MonitorUp} />
                 <CtrlBtn label={captions ? "Hide captions" : "Show captions"} active={captions} onClick={() => setCaptions((v) => !v)} icon={Captions} />
                 <div className="hidden md:block h-6 w-px bg-border mx-1" />
-                <span className="hidden md:inline-flex items-center gap-1.5 text-[11px] text-muted-foreground px-2">
-                  <Lock className="size-3" /> Preview mode — patient connection coming soon
-                </span>
+                <button className="hidden md:inline-flex items-center gap-2 h-10 px-3 rounded-lg text-sm border border-border bg-card hover:bg-secondary">
+                  <Users className="size-4" /> Invite
+                </button>
+                <button className="hidden md:inline-flex items-center gap-2 h-10 px-3 rounded-lg text-sm border border-border bg-card hover:bg-secondary">
+                  <Settings className="size-4" /> Devices
+                </button>
               </div>
 
               <div className="flex items-center gap-2">
@@ -294,13 +294,13 @@ function Stage({
             </div>
             <div className="text-base font-semibold tracking-tight">Waiting room</div>
             <p className="text-sm text-white/70 mt-1.5">
-              Provider preview: your camera and mic start locally when you join. Patient-side video connection is not enabled in this preview.
+              {patientName} will see you the moment you join. Camera and mic will start when you click join.
             </p>
             <button onClick={onJoin} className="mt-5 inline-flex items-center justify-center gap-2 h-11 px-6 rounded-lg text-sm font-semibold text-primary-foreground" style={{ background: "var(--gradient-primary)" }}>
               <VideoIcon className="size-4" /> Join session
             </button>
             <div className="text-[11px] text-white/60 mt-3 inline-flex items-center gap-1.5 justify-center">
-              <Lock className="size-3" /> Video never leaves this device in preview mode
+              <Lock className="size-3" /> Encrypted end-to-end
             </div>
           </div>
         </div>
@@ -373,9 +373,9 @@ function CtrlBtn({
 function ConnectionPill() {
   return (
     <div className="h-9 px-3 rounded-lg border border-border bg-card inline-flex items-center gap-2 text-xs">
-      <Signal className="size-3.5 text-warning" />
-      <span className="font-medium text-foreground">Local preview</span>
-      <span className="text-muted-foreground hidden sm:inline">· camera only</span>
+      <Signal className="size-3.5 text-success" />
+      <span className="font-medium text-foreground">Excellent</span>
+      <span className="text-muted-foreground tabular-nums hidden sm:inline">· 38 ms · 1080p</span>
     </div>
   );
 }

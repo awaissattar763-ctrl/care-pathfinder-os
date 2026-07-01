@@ -4,7 +4,6 @@ import { Receipt } from "lucide-react";
 import { useClaims, useUpdateClaimStatus } from "@/hooks/queries";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/EmptyState";
-import { QueryErrorState } from "@/components/QueryErrorState";
 
 export const Route = createFileRoute("/claims")({ component: ClaimsPage });
 
@@ -18,7 +17,7 @@ const tone: Record<string, string> = {
 const statusOptions = ["Submitted", "In review", "Approved", "Denied"];
 
 function ClaimsPage() {
-  const { data: claims, isLoading, isError, refetch } = useClaims();
+  const { data: claims, isLoading } = useClaims();
   const updateStatus = useUpdateClaimStatus();
 
   const submittedMTD = (claims ?? []).reduce((s, c) => s + Number(c.amount || 0), 0);
@@ -69,9 +68,7 @@ function ClaimsPage() {
           </div>
           <button className="btn btn-ghost btn-sm">Filter</button>
         </div>
-        {isError ? (
-            <QueryErrorState onRetry={() => refetch()} />
-          ) : isLoading ? (
+        {isLoading ? (
           <div className="p-6 space-y-3">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}</div>
         ) : !claims || claims.length === 0 ? (
           <EmptyState icon={Receipt} title="No claims submitted" description="Claims will appear here once you submit them to payers." />

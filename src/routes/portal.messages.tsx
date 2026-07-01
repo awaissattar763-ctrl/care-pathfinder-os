@@ -5,13 +5,12 @@ import {
   useConversations, useMessages, useSendMessage, useCreateConversation, useMyPatientId,
 } from "@/hooks/portal-queries";
 import { useAuth } from "@/hooks/use-auth";
-import { QueryErrorState } from "@/components/QueryErrorState";
 
 export const Route = createFileRoute("/portal/messages")({ component: PortalMessages });
 
 function PortalMessages() {
   const { data: pid } = useMyPatientId();
-  const { data: convos, isError: convosError, refetch: refetchConvos } = useConversations();
+  const { data: convos } = useConversations();
   const [activeId, setActiveId] = useState<string | null>(null);
   const create = useCreateConversation();
 
@@ -34,10 +33,6 @@ function PortalMessages() {
           <Plus className="size-3.5" /> New
         </button>
       </header>
-
-      {convosError && (
-        <QueryErrorState compact title="Couldn't load your messages" onRetry={() => refetchConvos()} />
-      )}
 
       <div className="grid md:grid-cols-[260px,1fr] gap-3">
         <aside className="rounded-xl border border-border bg-card overflow-hidden">

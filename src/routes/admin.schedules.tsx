@@ -4,7 +4,6 @@ import { useProviders } from "@/hooks/queries";
 import { useProviderSchedules, useUpsertSchedule, useDeleteSchedule } from "@/hooks/portal-queries";
 import { usePermissions } from "@/lib/rbac";
 import { Calendar, Trash2, Plus, Shield } from "lucide-react";
-import { QueryErrorState } from "@/components/QueryErrorState";
 
 const WEEKDAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 
@@ -14,7 +13,7 @@ function AdminSchedules() {
   const perms = usePermissions();
   const { data: providers } = useProviders();
   const [providerId, setProviderId] = useState<string>("");
-  const { data: schedules, isLoading: schedulesLoading, isError: schedulesError, refetch: refetchSchedules } = useProviderSchedules(providerId || undefined);
+  const { data: schedules } = useProviderSchedules(providerId || undefined);
   const upsert = useUpsertSchedule();
   const del = useDeleteSchedule();
 
@@ -48,13 +47,6 @@ function AdminSchedules() {
           {(providers ?? []).map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
         </select>
       </header>
-
-      {schedulesError && (
-        <QueryErrorState compact title="Couldn't load schedules" onRetry={() => refetchSchedules()} />
-      )}
-      {schedulesLoading && providerId && (
-        <div className="text-sm text-muted-foreground">Loading schedules…</div>
-      )}
 
       <form
         onSubmit={async (e) => {

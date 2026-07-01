@@ -2,14 +2,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMyPatient, useMyAppointments, useMyLabResults, useMyPrescriptions } from "@/hooks/portal-queries";
 import { CalendarDays, FlaskConical, FileText, Video, MessageSquare, ShieldCheck, AlertTriangle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { QueryErrorState } from "@/components/QueryErrorState";
 
 export const Route = createFileRoute("/portal/")({
   component: PortalHome,
 });
 
 function PortalHome() {
-  const { data: patient, isLoading, isError, refetch } = useMyPatient();
+  const { data: patient, isLoading } = useMyPatient();
   const { data: appts } = useMyAppointments();
   const { data: labs } = useMyLabResults();
   const { data: rx } = useMyPrescriptions();
@@ -19,10 +18,6 @@ function PortalHome() {
   const activeRx = (rx ?? []).filter((r) => r.status !== "Cancelled").slice(0, 3);
 
   if (isLoading) return <Skeleton className="h-40 w-full" />;
-
-  if (isError) {
-    return <QueryErrorState title="Couldn't load your portal" description="Please try again — if this keeps happening, contact your clinic." onRetry={() => refetch()} />;
-  }
 
   if (!patient) {
     return (

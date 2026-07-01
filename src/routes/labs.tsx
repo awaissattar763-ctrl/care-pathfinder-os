@@ -7,11 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { NewLabOrderDialog } from "@/components/dialogs/NewLabOrderDialog";
 import { LabResultDrawer } from "@/components/labs/LabResultDrawer";
 import { useLabOrders, useUpdateLabOrderStatus, type LabOrderWithRefs } from "@/hooks/queries";
-import { GuardedAction, Can } from "@/components/rbac/Can";
-import { usePermissions } from "@/lib/rbac";
-import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { QueryErrorState } from "@/components/QueryErrorState";
 
 export const Route = createFileRoute("/labs")({ component: LabsPage });
 
@@ -34,23 +30,10 @@ function statusPill(s: string) {
 }
 
 function LabsPage() {
-  const { data, isLoading, isError, refetch } = useLabOrders();
+  const { data, isLoading } = useLabOrders();
   const [tab, setTab] = useState("all");
   const [active, setActive] = useState<LabOrderWithRefs | null>(null);
   const update = useUpdateLabOrderStatus();
-  const perms = usePermissions();
-
-  function advance(status: string) {
-    if (!active) return;
-    // Marking results requires labs.result (Lab Technician / Admin);
-    // collection + cancellation require labs.write.
-    const needed = status === "resulted" ? "labs.result" : "labs.write";
-    if (!perms.has(needed as never)) {
-      toast.error(status === "resulted" ? "Requires Lab Technician role" : "Requires lab write access");
-      return;
-    }
-    update.mutate({ id: active.id, status });
-  }
 
   const filtered = useMemo(() => {
     const all = data ?? [];
@@ -74,16 +57,9 @@ function LabsPage() {
         title="Lab orders & results"
         description="Order tests, track collection, and review discrete results in one place."
         actions={
-          <GuardedAction
-            perm="labs.write"
-            action="labs.create_order"
-            label="New lab order"
-            icon={<Plus className="size-4" />}
-          >
-            <NewLabOrderDialog
-              trigger={<button className="btn btn-primary"><Plus className="size-4" /> New lab order</button>}
-            />
-          </GuardedAction>
+          <NewLabOrderDialog
+            trigger={<button className="btn btn-primary"><Plus className="size-4" /> New lab order</button>}
+          />
         }
       />
 
@@ -116,20 +92,14 @@ function LabsPage() {
           </div>
         </div>
 
-        {isError ? (
-            <QueryErrorState onRetry={() => refetch()} />
-          ) : isLoading ? (
+        {isLoading ? (
           <div className="p-5 space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-14 w-full" />)}</div>
         ) : filtered.length === 0 ? (
           <EmptyState
             icon={FlaskConical}
             title={tab === "all" ? "No lab orders yet" : `No ${tab} orders`}
             description="Submit an order to start the diagnostic workflow."
-            action={
-              <Can perm="labs.write">
-                <NewLabOrderDialog trigger={<button className="btn btn-primary"><Plus className="size-4" /> New lab order</button>} />
-              </Can>
-            }
+            action={<NewLabOrderDialog trigger={<button className="btn btn-primary"><Plus className="size-4" /> New lab order</button>} />}
           />
         ) : (
           <ul className="divide-y divide-border">
@@ -178,7 +148,7 @@ function LabsPage() {
         order={active}
         open={!!active}
         onOpenChange={(o) => !o && setActive(null)}
-        onAdvance={advance}
+        onAdvance={(status) => active && update.mutate({ id: active.id, status })}
       />
     </div>
   );

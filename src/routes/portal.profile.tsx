@@ -7,12 +7,11 @@ import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { User as UserIcon, Shield, Activity, Save } from "lucide-react";
 import { logAudit } from "@/lib/audit";
-import { QueryErrorState } from "@/components/QueryErrorState";
 
 export const Route = createFileRoute("/portal/profile")({ component: PortalProfile });
 
 function PortalProfile() {
-  const { data: patient, isLoading, isError, refetch } = useMyPatient();
+  const { data: patient } = useMyPatient();
   const { user } = useAuth();
   const { data: sessions } = useSessionLog(20);
   const [phone, setPhone] = useState("");
@@ -23,9 +22,7 @@ function PortalProfile() {
     if (patient) { setPhone(patient.phone ?? ""); setAddress(patient.address ?? ""); }
   }, [patient]);
 
-  if (isLoading) return <div className="text-sm text-muted-foreground">Loading…</div>;
-  if (isError) return <QueryErrorState title="Couldn't load your profile" onRetry={() => refetch()} />;
-  if (!patient) return <div className="text-sm text-muted-foreground">Your account isn't linked to a patient chart yet.</div>;
+  if (!patient) return <div className="text-sm text-muted-foreground">Loading…</div>;
 
   const onSave = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,44 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "@/components/PageHeader";
-import { Sparkles, AlertTriangle, Send, Loader2, Square, RotateCcw } from "lucide-react";
-import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
-import { useChat } from "@ai-sdk/react";
-import type { UIMessage } from "ai";
-import { createAuthedChatTransport } from "@/lib/authed-chat-transport";
+import { Sparkles, AlertTriangle, Send } from "lucide-react";
+import { useState } from "react";
 
 export const Route = createFileRoute("/symptom-checker")({ component: SymptomChecker });
 
-const STARTERS = [
-  "Adult with 3 days of dull morning headache and mild nausea — triage questions?",
-  "Pediatric patient, fever 39.2°C for 48h, no rash — differentials to consider?",
-  "Chest tightness on exertion, resolves with rest — red flags to screen?",
+const sampleConversation = [
+  { role: "patient", text: "I've had a dull headache for 3 days, worse in the morning, with mild nausea." },
+  { role: "ai", text: "Thanks. A few quick questions: any vision changes, neck stiffness, or recent head injury? Also, current medications?" },
+  { role: "patient", text: "No vision changes, no injury. Taking lisinopril daily." },
+  { role: "ai", text: "Most likely differentials based on report: tension-type headache, medication-related, or sinus involvement. Red flags absent. Suggested for clinician review: BP check, hydration assessment, consider trial of analgesic if appropriate.\n\nThis is decision support only — not a diagnosis." },
 ];
-
-function messageText(m: UIMessage) {
-  return m.parts
-    .map((p) => (p.type === "text" ? p.text : ""))
-    .filter(Boolean)
-    .join("\n");
-}
 
 function SymptomChecker() {
   const [input, setInput] = useState("");
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const transport = useMemo(() => createAuthedChatTransport(), []);
-  const { messages, sendMessage, status, stop, setMessages, error } = useChat({ transport });
-  const isLoading = status === "submitted" || status === "streaming";
-
-  useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages, status]);
-
-  function submit(e?: FormEvent) {
-    e?.preventDefault();
-    const t = input.trim();
-    if (!t || isLoading) return;
-    sendMessage({ text: `Triage assistance request from clinician:\n${t}` });
-    setInput("");
-  }
 
   return (
     <div>
@@ -60,107 +35,60 @@ function SymptomChecker() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 rounded-xl border border-border bg-card overflow-hidden flex flex-col" style={{ boxShadow: "var(--shadow-card)", minHeight: 520 }}>
-          <div className="px-5 py-4 border-b border-border flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <div className="size-8 rounded-lg flex items-center justify-center text-primary-foreground" style={{ background: "var(--gradient-primary)" }}>
-                <Sparkles className="size-4" />
-              </div>
-              <div>
-                <div className="font-semibold tracking-tight text-sm">Triage Assistant</div>
-                <div className="text-[11px] text-muted-foreground">Staff-only · powered by HealthOS Copilot</div>
-              </div>
+          <div className="px-5 py-4 border-b border-border flex items-center gap-2">
+            <div className="size-8 rounded-lg flex items-center justify-center text-primary-foreground" style={{ background: "var(--gradient-primary)" }}>
+              <Sparkles className="size-4" />
             </div>
-            {messages.length > 0 && (
-              <button
-                onClick={() => setMessages([])}
-                className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
-              >
-                <RotateCcw className="size-3" /> New session
-              </button>
-            )}
+            <div>
+              <div className="font-semibold tracking-tight text-sm">Triage Assistant</div>
+              <div className="text-[11px] text-muted-foreground">Session for Maya Chen · 42F</div>
+            </div>
           </div>
-
-          <div ref={scrollRef} className="flex-1 p-5 space-y-4 overflow-auto">
-            {messages.length === 0 && !isLoading && (
-              <div className="h-full flex flex-col items-center justify-center text-center gap-3 py-10">
-                <div className="text-sm text-muted-foreground max-w-sm">
-                  Describe the presentation — symptoms, duration, vitals — and the assistant will suggest triage questions and differentials for clinician review.
-                </div>
-                <div className="flex flex-col gap-2 w-full max-w-md">
-                  {STARTERS.map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => { sendMessage({ text: `Triage assistance request from clinician:\n${s}` }); }}
-                      className="text-left text-xs px-3 py-2 rounded-lg border border-border hover:bg-secondary/60 transition"
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {messages.map((m) => (
-              <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+          <div className="flex-1 p-5 space-y-4 overflow-auto">
+            {sampleConversation.map((m, i) => (
+              <div key={i} className={`flex ${m.role === "patient" ? "justify-end" : "justify-start"}`}>
                 <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-line ${
-                  m.role === "user" ? "bg-primary text-primary-foreground rounded-br-sm" : "bg-secondary text-foreground rounded-bl-sm"
+                  m.role === "patient" ? "bg-primary text-primary-foreground rounded-br-sm" : "bg-secondary text-foreground rounded-bl-sm"
                 }`}>
-                  {messageText(m)}
+                  {m.text}
                 </div>
               </div>
             ))}
-
-            {status === "submitted" && (
-              <div className="flex justify-start">
-                <div className="rounded-2xl px-4 py-2.5 bg-secondary text-sm text-muted-foreground inline-flex items-center gap-2">
-                  <Loader2 className="size-3.5 animate-spin" /> Thinking…
-                </div>
-              </div>
-            )}
-
-            {error && (
-              <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs text-destructive flex items-center justify-between gap-2">
-                <span>The assistant is unavailable right now — {error.message || "request failed"}.</span>
-                <button onClick={() => submit()} className="underline shrink-0">Retry</button>
-              </div>
-            )}
           </div>
-
-          <form onSubmit={submit} className="p-3 border-t border-border flex items-center gap-2">
+          <div className="p-3 border-t border-border flex items-center gap-2">
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Describe symptoms, duration, vitals…"
-              aria-label="Describe symptoms"
+              placeholder="Describe symptoms…"
               className="flex-1 h-10 px-3 rounded-lg bg-secondary text-sm outline-none focus:ring-2 focus:ring-ring/40"
             />
-            {isLoading ? (
-              <button type="button" onClick={() => stop()} aria-label="Stop generating" className="h-10 w-10 rounded-lg flex items-center justify-center bg-secondary text-foreground">
-                <Square className="size-4" />
-              </button>
-            ) : (
-              <button type="submit" disabled={!input.trim()} aria-label="Send" className="h-10 w-10 rounded-lg flex items-center justify-center text-primary-foreground disabled:opacity-50" style={{ background: "var(--gradient-primary)" }}>
-                <Send className="size-4" />
-              </button>
-            )}
-          </form>
+            <button className="h-10 w-10 rounded-lg flex items-center justify-center text-primary-foreground" style={{ background: "var(--gradient-primary)" }}>
+              <Send className="size-4" />
+            </button>
+          </div>
         </div>
 
         <div className="space-y-4">
           <div className="rounded-xl border border-border bg-card p-5" style={{ boxShadow: "var(--shadow-card)" }}>
-            <div className="font-semibold tracking-tight text-sm mb-3">How to get good triage output</div>
-            <ul className="space-y-2 text-xs text-muted-foreground list-disc pl-4">
-              <li>Include age, duration, severity, and relevant vitals.</li>
-              <li>Mention current medications and allergies.</li>
-              <li>State what has already been ruled out.</li>
-              <li>Ask for differentials, triage questions, or red-flag screens explicitly.</li>
+            <div className="font-semibold tracking-tight text-sm mb-3">Suggested differentials</div>
+            <ul className="space-y-2 text-sm">
+              {[
+                ["Tension-type headache", "62%"],
+                ["Medication side-effect", "21%"],
+                ["Sinus involvement", "11%"],
+                ["Other", "6%"],
+              ].map(([label, pct]) => (
+                <li key={label} className="flex items-center justify-between">
+                  <span>{label}</span>
+                  <span className="text-xs text-muted-foreground tabular-nums">{pct}</span>
+                </li>
+              ))}
             </ul>
           </div>
           <div className="rounded-xl border border-border bg-card p-5" style={{ boxShadow: "var(--shadow-card)" }}>
-            <div className="font-semibold tracking-tight text-sm mb-2">Common red flags to screen</div>
-            <div className="text-xs text-muted-foreground leading-relaxed">
-              Sudden/thunderclap onset · vision changes · neck stiffness · focal neuro deficits · chest pain with exertion · trauma · immunocompromise · pregnancy. Always escalate per clinic protocol when present.
-            </div>
+            <div className="font-semibold tracking-tight text-sm mb-2">Red-flag screen</div>
+            <div className="text-xs text-success font-medium">No red flags detected.</div>
+            <div className="text-xs text-muted-foreground mt-2">Vision changes · neck stiffness · trauma · thunderclap onset</div>
           </div>
         </div>
       </div>

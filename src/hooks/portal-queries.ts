@@ -84,6 +84,21 @@ export function useMyLabResults() {
   });
 }
 
+export function useMySoapNotes() {
+  const { data: patientId } = useMyPatientId();
+  return useQuery({
+    queryKey: ["my-soap", patientId],
+    enabled: !!patientId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("soap_notes").select("*")
+        .eq("patient_id", patientId!)
+        .order("date", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
 
 /* -------- Conversations / Messages -------- */
 
@@ -111,6 +126,32 @@ export function useConversations(patientId?: string | null) {
   });
 }
 
+export function useAllConversations() {
+  return useQuery({
+    queryKey: ["conversations", "all"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("conversations")
+        .select("*")
+        .order("last_message_at", { ascending: false });
+      if (error) throw error;
+      const rows = data ?? [];
+      const patientIds = Array.from(new Set(rows.map((r) => r.patient_id)));
+      const providerIds = Array.from(new Set(rows.map((r) => r.provider_id).filter(Boolean) as string[]));
+      const [patients, providers] = await Promise.all([
+        patientIds.length ? supabase.from("patients").select("id,name,mrn").in("id", patientIds) : Promise.resolve({ data: [] as { id: string; name: string; mrn: string }[] }),
+        providerIds.length ? supabase.from("providers").select("id,name,specialty").in("id", providerIds) : Promise.resolve({ data: [] as { id: string; name: string; specialty: string | null }[] }),
+      ]);
+      const pmap = new Map((patients.data ?? []).map((p) => [p.id, p]));
+      const prmap = new Map((providers.data ?? []).map((p) => [p.id, p]));
+      return rows.map((r) => ({
+        ...r,
+        patient: pmap.get(r.patient_id) ?? null,
+        provider: r.provider_id ? prmap.get(r.provider_id) ?? null : null,
+      }));
+    },
+  });
+}
 
 export function useMessages(conversationId: string | null) {
   const qc = useQueryClient();
@@ -293,37 +334,5 @@ export function useDeleteSchedule() {
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["provider-schedules"] }); toast.success("Schedule removed"); },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Could not delete schedule"),
-  });
-}
-/** Directory of staff users (providers have a user_id link) for the role management screen. */
-export function useStaffDirectory() {
-  return useQuery({
-    queryKey: ["admin", "staff_directory"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("providers")
-        .select("user_id, name, email, specialty")
-        .not("user_id", "is", null)
-        .order("name");
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
-}
-
-/** Recent RBAC-relevant audit events: role changes + denied access attempts. */
-export function useRbacAudit(limit = 30) {
-  return useQuery({
-    queryKey: ["admin", "rbac_audit", limit],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("audit_logs")
-        .select("*")
-        .in("action", ["role.assign", "role.revoke", "access.denied"])
-        .order("created_at", { ascending: false })
-        .limit(limit);
-      if (error) throw error;
-      return data ?? [];
-    },
   });
 }

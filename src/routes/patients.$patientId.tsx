@@ -39,8 +39,6 @@ import { useLabOrders } from "@/hooks/queries";
 import { NewLabOrderDialog } from "@/components/dialogs/NewLabOrderDialog";
 
 import { cn } from "@/lib/utils";
-import { Can } from "@/components/rbac/Can";
-import { QueryErrorState } from "@/components/QueryErrorState";
 
 export const Route = createFileRoute("/patients/$patientId")({
   component: PatientProfilePage,
@@ -58,12 +56,10 @@ function PatientLabOrders({ patientId }: { patientId: string }) {
     <div>
       <div className="flex items-center justify-between mb-2">
         <div className="text-xs text-muted-foreground">{orders.length} lab order{orders.length === 1 ? "" : "s"}</div>
-        <Can perm="labs.write">
-          <NewLabOrderDialog
-            defaultPatientId={patientId}
-            trigger={<button className="text-xs text-primary font-medium hover:underline inline-flex items-center gap-1"><Plus className="size-3" /> New order</button>}
-          />
-        </Can>
+        <NewLabOrderDialog
+          defaultPatientId={patientId}
+          trigger={<button className="text-xs text-primary font-medium hover:underline inline-flex items-center gap-1"><Plus className="size-3" /> New order</button>}
+        />
       </div>
       {isLoading ? (
         <div className="text-xs text-muted-foreground">Loading…</div>
@@ -117,6 +113,113 @@ function calcAge(dob: string | null | undefined) {
   const diff = Date.now() - new Date(dob).getTime();
   return Math.floor(diff / 3.15576e10);
 }
+
+// ----------------------------- Demo data -----------------------------
+const patient = {
+  id: "P-10234",
+  name: "Maya Chen",
+  pronouns: "she/her",
+  dob: "March 14, 1984",
+  age: 42,
+  sex: "Female",
+  bloodGroup: "A+",
+  mrn: "MRN-884127",
+  primaryCare: "Dr. Adaeze Okafor, MD",
+  insurance: { provider: "Aetna PPO", policy: "AET-553-2098-44", group: "G-77821", validThrough: "Dec 2026" },
+  contact: { phone: "+1 (415) 555-0184", email: "maya.chen@example.com", address: "1280 Sutter St, Apt 4B, San Francisco, CA" },
+  emergency: { name: "Wei Chen", relation: "Spouse", phone: "+1 (415) 555-0190" },
+  flags: ["Asthma action plan on file", "Prefers AM appointments"],
+  riskScore: 38,
+};
+
+const allergies = [
+  { name: "Penicillin", reaction: "Anaphylaxis", severity: "severe" },
+  { name: "Peanuts", reaction: "Hives, swelling", severity: "moderate" },
+  { name: "Latex", reaction: "Contact dermatitis", severity: "mild" },
+];
+
+const conditions = [
+  { name: "Essential hypertension", code: "I10", since: "2019", status: "Active" },
+  { name: "Mild persistent asthma", code: "J45.30", since: "2008", status: "Controlled" },
+  { name: "Vitamin D deficiency", code: "E55.9", since: "2023", status: "Monitoring" },
+];
+
+const medications = [
+  { name: "Lisinopril", dose: "10 mg", freq: "1× daily", started: "Jan 2022", prescriber: "Dr. Okafor", refills: 3 },
+  { name: "Albuterol HFA", dose: "90 mcg", freq: "PRN, 2 puffs", started: "Mar 2008", prescriber: "Dr. Mendez", refills: 5 },
+  { name: "Cholecalciferol", dose: "2000 IU", freq: "1× daily", started: "Aug 2023", prescriber: "Dr. Okafor", refills: 11 },
+  { name: "Loratadine", dose: "10 mg", freq: "PRN, seasonal", started: "Apr 2021", prescriber: "Dr. Okafor", refills: 2 },
+];
+
+const vitals = [
+  { label: "Blood pressure", value: "128 / 82", unit: "mmHg", trend: "down", series: [142, 138, 136, 134, 130, 132, 128] },
+  { label: "Resting HR", value: "72", unit: "bpm", trend: "down", series: [78, 80, 76, 74, 73, 74, 72] },
+  { label: "SpO₂", value: "98", unit: "%", trend: "flat", series: [97, 98, 97, 98, 98, 97, 98] },
+  { label: "BMI", value: "23.4", unit: "kg/m²", trend: "up", series: [22.8, 22.9, 23.0, 23.1, 23.2, 23.3, 23.4] },
+];
+
+const timeline = [
+  { date: "May 18, 2026", type: "Visit", title: "Annual physical", by: "Dr. Okafor", note: "Routine wellness exam. Labs ordered." },
+  { date: "Apr 02, 2026", type: "Lab", title: "Lipid panel", by: "Quest Diagnostics", note: "LDL 118 mg/dL — borderline. Repeat in 6 mo." },
+  { date: "Feb 14, 2026", type: "Telehealth", title: "Asthma follow-up", by: "Dr. Mendez", note: "Symptoms stable on current regimen." },
+  { date: "Nov 22, 2025", type: "Imaging", title: "Chest X-ray PA/Lat", by: "SF Radiology", note: "No acute cardiopulmonary findings." },
+  { date: "Sep 09, 2025", type: "Visit", title: "BP recheck", by: "Dr. Okafor", note: "Lisinopril titrated to 10 mg." },
+];
+
+const labs = [
+  { name: "Comprehensive Metabolic Panel", date: "Apr 02, 2026", status: "Final", flagged: false, size: "184 KB" },
+  { name: "Lipid Panel", date: "Apr 02, 2026", status: "Final", flagged: true, size: "92 KB" },
+  { name: "HbA1c", date: "Apr 02, 2026", status: "Final", flagged: false, size: "48 KB" },
+  { name: "CBC w/ Differential", date: "Jan 11, 2026", status: "Final", flagged: false, size: "112 KB" },
+];
+
+const scans = [
+  { name: "Chest X-ray PA/Lat", modality: "X-Ray", date: "Nov 22, 2025", size: "4.2 MB" },
+  { name: "Pulmonary function test", modality: "PFT", date: "Feb 14, 2026", size: "1.1 MB" },
+  { name: "ECG 12-lead", modality: "ECG", date: "May 18, 2026", size: "320 KB" },
+];
+
+const soapNotes = [
+  {
+    date: "May 18, 2026",
+    author: "Dr. Adaeze Okafor",
+    s: "Patient reports feeling well overall. Occasional morning headaches, no chest pain, no SOB. Sleep 6–7 hr.",
+    o: "BP 128/82, HR 72, SpO₂ 98%. Lungs clear bilaterally. No peripheral edema.",
+    a: "Hypertension — controlled. Asthma — stable. Vitamin D — repleting.",
+    p: "Continue Lisinopril 10 mg. Recheck BP in 3 months. Repeat lipid panel in 6 months.",
+  },
+  {
+    date: "Feb 14, 2026",
+    author: "Dr. Luis Mendez",
+    s: "No nocturnal symptoms. Uses rescue inhaler ~1×/week during pollen exposure.",
+    o: "Peak flow 92% of personal best. Auscultation clear.",
+    a: "Mild persistent asthma — well controlled.",
+    p: "Continue current regimen. Reinforce trigger avoidance.",
+  },
+];
+
+const prescriptions = [
+  { rx: "RX-220914", drug: "Lisinopril 10 mg", date: "May 18, 2026", prescriber: "Dr. Okafor", status: "Active" },
+  { rx: "RX-220801", drug: "Cholecalciferol 2000 IU", date: "Apr 02, 2026", prescriber: "Dr. Okafor", status: "Active" },
+  { rx: "RX-219455", drug: "Albuterol HFA 90 mcg", date: "Feb 14, 2026", prescriber: "Dr. Mendez", status: "Active" },
+  { rx: "RX-218110", drug: "Amoxicillin 500 mg", date: "Oct 11, 2025", prescriber: "Dr. Okafor", status: "Completed" },
+];
+
+const appointments = [
+  { date: "Jun 12, 2026 · 09:30", type: "BP recheck", with: "Dr. Okafor", status: "Upcoming" },
+  { date: "May 18, 2026 · 10:00", type: "Annual physical", with: "Dr. Okafor", status: "Completed" },
+  { date: "Feb 14, 2026 · 14:15", type: "Asthma follow-up", with: "Dr. Mendez", status: "Completed" },
+  { date: "Sep 09, 2025 · 11:00", type: "BP recheck", with: "Dr. Okafor", status: "Completed" },
+];
+
+const auditTrail = [
+  { who: "Dr. Adaeze Okafor", role: "Primary care", action: "Viewed chart", when: "Today · 09:14" },
+  { who: "Nurse R. Patel", role: "RN", action: "Updated vitals", when: "Today · 09:02" },
+  { who: "Billing · S. Ahmed", role: "Admin", action: "Accessed insurance", when: "Yesterday · 16:48" },
+  { who: "Dr. Luis Mendez", role: "Pulmonology", action: "Viewed PFT report", when: "May 21 · 11:20" },
+];
+
+// ----------------------------- Subcomponents -----------------------------
 
 const sections = [
   { id: "overview", label: "Overview", icon: User2 },
@@ -212,7 +315,7 @@ function TrendIcon({ trend }: { trend: string }) {
 
 function PatientProfilePage() {
   const { patientId } = Route.useParams();
-  const { data, isLoading, isError, refetch } = usePatientDetails(patientId);
+  const { data, isLoading } = usePatientDetails(patientId);
 
   if (isLoading) {
     return (
@@ -229,18 +332,6 @@ function PatientProfilePage() {
             <Skeleton className="h-64" />
           </div>
         </div>
-      </div>
-    );
-  }
-
-  if (isError) {
-    return (
-      <div className="p-8 max-w-md mx-auto">
-        <QueryErrorState
-          title="Couldn't load this patient chart"
-          description="The record may be unavailable or your session may have expired."
-          onRetry={() => refetch()}
-        />
       </div>
     );
   }
@@ -299,21 +390,6 @@ function PatientProfilePage() {
 
   const medications = data.prescriptions.map((pr: any) => ({
     rx: pr.rx_number, name: pr.drug, dose: pr.sig, freq: "—", route: "—", started: formatDate(pr.created_at), prescriber: pr.provider?.name || "Unknown", status: pr.status || "Active", refills: 0
-  }));
-
-  const prescriptions = data.prescriptions.map((pr: any) => ({
-    rx: pr.rx_number, drug: pr.drug, date: formatDate(pr.created_at),
-    prescriber: pr.provider?.name || "Unknown",
-    status: (pr.status || "active").charAt(0).toUpperCase() + (pr.status || "active").slice(1),
-  }));
-
-  const appointments = data.appointments.map((a: any) => ({
-    date: formatDateTime(a.scheduled_at),
-    type: a.reason || a.visit_type || "Visit",
-    with: a.provider?.name || "Unassigned",
-    status: new Date(a.scheduled_at) > new Date() && a.status !== "cancelled" && a.status !== "completed"
-      ? "Upcoming"
-      : (a.status || "completed").charAt(0).toUpperCase() + (a.status || "completed").slice(1),
   }));
 
   const auditTrail = data.auditLogs.map((al: any) => ({

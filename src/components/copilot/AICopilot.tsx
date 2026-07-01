@@ -1,5 +1,5 @@
 import { useChat } from "@ai-sdk/react";
-import { type UIMessage } from "ai";
+import { DefaultChatTransport, type UIMessage } from "ai";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Sparkles,
@@ -18,7 +18,6 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCopilot } from "./CopilotContext";
-import { createAuthedChatTransport } from "@/lib/authed-chat-transport";
 import { Markdown } from "./Markdown";
 
 const QUICK_ACTIONS = [
@@ -36,8 +35,8 @@ export function AICopilot() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const transport = useMemo(() => createAuthedChatTransport(), []);
-  const { messages, sendMessage, status, stop, setMessages, error, regenerate } = useChat({
+  const transport = useMemo(() => new DefaultChatTransport({ api: "/api/chat" }), []);
+  const { messages, sendMessage, status, stop, setMessages } = useChat({
     transport,
   });
 
@@ -146,13 +145,6 @@ export function AICopilot() {
           ))}
 
           {status === "submitted" && <TypingIndicator />}
-
-          {error && (
-            <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs text-destructive flex items-center justify-between gap-2">
-              <span className="min-w-0 truncate">Copilot request failed — {error.message || "service unavailable"}.</span>
-              <button onClick={() => regenerate()} className="underline shrink-0">Retry</button>
-            </div>
-          )}
         </div>
 
         {/* Composer */}
@@ -284,5 +276,42 @@ function TypingIndicator() {
         <span className="ml-2 text-xs">Thinking…</span>
       </div>
     </div>
+  );
+}
+
+export function CopilotLauncher() {
+  const { toggleCopilot, open } = useCopilot();
+
+  // Cmd/Ctrl + J shortcut
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "j") {
+        e.preventDefault();
+        toggleCopilot();
+      }
+    };
+    window.addEventListener("keydown", h);
+    return () => window.removeEventListener("keydown", h);
+  }, [toggleCopilot]);
+
+  if (open) return null;
+
+  return (
+    <button
+      onClick={() => toggleCopilot()}
+      aria-label="Open HealthOS Copilot"
+      title="Open Copilot (⌘J)"
+      className="fixed bottom-6 right-6 z-40 group flex items-center gap-2 pl-3 pr-4 h-12 rounded-full text-primary-foreground shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5"
+      style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-glow)" }}
+    >
+      <span className="relative flex items-center justify-center size-7 rounded-full bg-white/15">
+        <Sparkles className="size-4" />
+        <span className="absolute inset-0 rounded-full bg-white/20 animate-ping opacity-40" />
+      </span>
+      <span className="text-sm font-medium">Copilot</span>
+      <kbd className="hidden sm:inline-flex ml-1 text-[10px] px-1.5 py-0.5 rounded bg-white/15 font-medium">
+        ⌘J
+      </kbd>
+    </button>
   );
 }

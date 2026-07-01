@@ -21,7 +21,6 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as TelemedicineIndexRouteImport } from './routes/telemedicine.index'
 import { Route as PortalIndexRouteImport } from './routes/portal.index'
 import { Route as PatientsIndexRouteImport } from './routes/patients.index'
-import { Route as BillingIndexRouteImport } from './routes/billing.index'
 import { Route as TelemedicineAppointmentIdRouteImport } from './routes/telemedicine.$appointmentId'
 import { Route as PortalProfileRouteImport } from './routes/portal.profile'
 import { Route as PortalPrescriptionsRouteImport } from './routes/portal.prescriptions'
@@ -29,8 +28,6 @@ import { Route as PortalMessagesRouteImport } from './routes/portal.messages'
 import { Route as PortalLabsRouteImport } from './routes/portal.labs'
 import { Route as PortalAppointmentsRouteImport } from './routes/portal.appointments'
 import { Route as PatientsPatientIdRouteImport } from './routes/patients.$patientId'
-import { Route as BillingAnalyticsRouteImport } from './routes/billing.analytics'
-import { Route as BillingInvoiceIdRouteImport } from './routes/billing.$invoiceId'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminSchedulesRouteImport } from './routes/admin.schedules'
@@ -95,11 +92,6 @@ const PatientsIndexRoute = PatientsIndexRouteImport.update({
   path: '/patients/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BillingIndexRoute = BillingIndexRouteImport.update({
-  id: '/billing/',
-  path: '/billing/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const TelemedicineAppointmentIdRoute =
   TelemedicineAppointmentIdRouteImport.update({
     id: '/telemedicine/$appointmentId',
@@ -136,16 +128,6 @@ const PatientsPatientIdRoute = PatientsPatientIdRouteImport.update({
   path: '/patients/$patientId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BillingAnalyticsRoute = BillingAnalyticsRouteImport.update({
-  id: '/billing/analytics',
-  path: '/billing/analytics',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BillingInvoiceIdRoute = BillingInvoiceIdRouteImport.update({
-  id: '/billing/$invoiceId',
-  path: '/billing/$invoiceId',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiChatRoute = ApiChatRouteImport.update({
   id: '/api/chat',
   path: '/api/chat',
@@ -175,8 +157,6 @@ export interface FileRoutesByFullPath {
   '/admin/schedules': typeof AdminSchedulesRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
-  '/billing/$invoiceId': typeof BillingInvoiceIdRoute
-  '/billing/analytics': typeof BillingAnalyticsRoute
   '/patients/$patientId': typeof PatientsPatientIdRoute
   '/portal/appointments': typeof PortalAppointmentsRoute
   '/portal/labs': typeof PortalLabsRoute
@@ -184,7 +164,6 @@ export interface FileRoutesByFullPath {
   '/portal/prescriptions': typeof PortalPrescriptionsRoute
   '/portal/profile': typeof PortalProfileRoute
   '/telemedicine/$appointmentId': typeof TelemedicineAppointmentIdRoute
-  '/billing/': typeof BillingIndexRoute
   '/patients/': typeof PatientsIndexRoute
   '/portal/': typeof PortalIndexRoute
   '/telemedicine/': typeof TelemedicineIndexRoute
@@ -201,8 +180,6 @@ export interface FileRoutesByTo {
   '/admin/schedules': typeof AdminSchedulesRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
-  '/billing/$invoiceId': typeof BillingInvoiceIdRoute
-  '/billing/analytics': typeof BillingAnalyticsRoute
   '/patients/$patientId': typeof PatientsPatientIdRoute
   '/portal/appointments': typeof PortalAppointmentsRoute
   '/portal/labs': typeof PortalLabsRoute
@@ -210,7 +187,6 @@ export interface FileRoutesByTo {
   '/portal/prescriptions': typeof PortalPrescriptionsRoute
   '/portal/profile': typeof PortalProfileRoute
   '/telemedicine/$appointmentId': typeof TelemedicineAppointmentIdRoute
-  '/billing': typeof BillingIndexRoute
   '/patients': typeof PatientsIndexRoute
   '/portal': typeof PortalIndexRoute
   '/telemedicine': typeof TelemedicineIndexRoute
@@ -229,8 +205,6 @@ export interface FileRoutesById {
   '/admin/schedules': typeof AdminSchedulesRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
-  '/billing/$invoiceId': typeof BillingInvoiceIdRoute
-  '/billing/analytics': typeof BillingAnalyticsRoute
   '/patients/$patientId': typeof PatientsPatientIdRoute
   '/portal/appointments': typeof PortalAppointmentsRoute
   '/portal/labs': typeof PortalLabsRoute
@@ -238,7 +212,6 @@ export interface FileRoutesById {
   '/portal/prescriptions': typeof PortalPrescriptionsRoute
   '/portal/profile': typeof PortalProfileRoute
   '/telemedicine/$appointmentId': typeof TelemedicineAppointmentIdRoute
-  '/billing/': typeof BillingIndexRoute
   '/patients/': typeof PatientsIndexRoute
   '/portal/': typeof PortalIndexRoute
   '/telemedicine/': typeof TelemedicineIndexRoute
@@ -258,8 +231,6 @@ export interface FileRouteTypes {
     | '/admin/schedules'
     | '/admin/users'
     | '/api/chat'
-    | '/billing/$invoiceId'
-    | '/billing/analytics'
     | '/patients/$patientId'
     | '/portal/appointments'
     | '/portal/labs'
@@ -267,7 +238,6 @@ export interface FileRouteTypes {
     | '/portal/prescriptions'
     | '/portal/profile'
     | '/telemedicine/$appointmentId'
-    | '/billing/'
     | '/patients/'
     | '/portal/'
     | '/telemedicine/'
@@ -284,8 +254,6 @@ export interface FileRouteTypes {
     | '/admin/schedules'
     | '/admin/users'
     | '/api/chat'
-    | '/billing/$invoiceId'
-    | '/billing/analytics'
     | '/patients/$patientId'
     | '/portal/appointments'
     | '/portal/labs'
@@ -293,7 +261,6 @@ export interface FileRouteTypes {
     | '/portal/prescriptions'
     | '/portal/profile'
     | '/telemedicine/$appointmentId'
-    | '/billing'
     | '/patients'
     | '/portal'
     | '/telemedicine'
@@ -311,8 +278,6 @@ export interface FileRouteTypes {
     | '/admin/schedules'
     | '/admin/users'
     | '/api/chat'
-    | '/billing/$invoiceId'
-    | '/billing/analytics'
     | '/patients/$patientId'
     | '/portal/appointments'
     | '/portal/labs'
@@ -320,7 +285,6 @@ export interface FileRouteTypes {
     | '/portal/prescriptions'
     | '/portal/profile'
     | '/telemedicine/$appointmentId'
-    | '/billing/'
     | '/patients/'
     | '/portal/'
     | '/telemedicine/'
@@ -339,11 +303,8 @@ export interface RootRouteChildren {
   AdminSchedulesRoute: typeof AdminSchedulesRoute
   AdminUsersRoute: typeof AdminUsersRoute
   ApiChatRoute: typeof ApiChatRoute
-  BillingInvoiceIdRoute: typeof BillingInvoiceIdRoute
-  BillingAnalyticsRoute: typeof BillingAnalyticsRoute
   PatientsPatientIdRoute: typeof PatientsPatientIdRoute
   TelemedicineAppointmentIdRoute: typeof TelemedicineAppointmentIdRoute
-  BillingIndexRoute: typeof BillingIndexRoute
   PatientsIndexRoute: typeof PatientsIndexRoute
   TelemedicineIndexRoute: typeof TelemedicineIndexRoute
 }
@@ -434,13 +395,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PatientsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/billing/': {
-      id: '/billing/'
-      path: '/billing'
-      fullPath: '/billing/'
-      preLoaderRoute: typeof BillingIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/telemedicine/$appointmentId': {
       id: '/telemedicine/$appointmentId'
       path: '/telemedicine/$appointmentId'
@@ -488,20 +442,6 @@ declare module '@tanstack/react-router' {
       path: '/patients/$patientId'
       fullPath: '/patients/$patientId'
       preLoaderRoute: typeof PatientsPatientIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/billing/analytics': {
-      id: '/billing/analytics'
-      path: '/billing/analytics'
-      fullPath: '/billing/analytics'
-      preLoaderRoute: typeof BillingAnalyticsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/billing/$invoiceId': {
-      id: '/billing/$invoiceId'
-      path: '/billing/$invoiceId'
-      fullPath: '/billing/$invoiceId'
-      preLoaderRoute: typeof BillingInvoiceIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/chat': {
@@ -562,24 +502,11 @@ const rootRouteChildren: RootRouteChildren = {
   AdminSchedulesRoute: AdminSchedulesRoute,
   AdminUsersRoute: AdminUsersRoute,
   ApiChatRoute: ApiChatRoute,
-  BillingInvoiceIdRoute: BillingInvoiceIdRoute,
-  BillingAnalyticsRoute: BillingAnalyticsRoute,
   PatientsPatientIdRoute: PatientsPatientIdRoute,
   TelemedicineAppointmentIdRoute: TelemedicineAppointmentIdRoute,
-  BillingIndexRoute: BillingIndexRoute,
   PatientsIndexRoute: PatientsIndexRoute,
   TelemedicineIndexRoute: TelemedicineIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

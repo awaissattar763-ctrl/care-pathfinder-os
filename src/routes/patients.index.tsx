@@ -1,14 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState , useEffect } from "react";
+import { useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { Plus, FileText, Lock, ShieldCheck, Search, Users } from "lucide-react";
 import { UrgencyBadge, type Urgency } from "@/components/UrgencyBadge";
 import { usePatients } from "@/hooks/queries";
 import { NewPatientDialog } from "@/components/dialogs/NewPatientDialog";
-import { GuardedAction, Can } from "@/components/rbac/Can";
 import { EmptyState } from "@/components/EmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
-import { QueryErrorState } from "@/components/QueryErrorState";
 
 export const Route = createFileRoute("/patients/")({ component: PatientsPage });
 
@@ -26,9 +24,7 @@ function calcAge(dob: string | null) {
 function PatientsPage() {
   const [search, setSearch] = useState("");
   const [triage, setTriage] = useState<string>("all");
-  const [pageLimit, setPageLimit] = useState(100);
-  useEffect(() => { setPageLimit(100); }, [search]);
-  const { data, isLoading, isError, refetch, isFetching } = usePatients(search, pageLimit);
+  const { data, isLoading } = usePatients(search);
 
   const filtered = (data ?? []).filter((p) => triage === "all" || p.urgency === triage);
 
@@ -46,14 +42,7 @@ function PatientsPage() {
               <option value="routine">Routine</option>
               <option value="stable">Stable</option>
             </select>
-            <GuardedAction
-              perm="patients.write"
-              action="patients.create"
-              label="New patient"
-              icon={<Plus className="size-4" />}
-            >
-              <NewPatientDialog trigger={<button className="btn btn-primary"><Plus className="size-4" /> New patient</button>} />
-            </GuardedAction>
+            <NewPatientDialog trigger={<button className="btn btn-primary"><Plus className="size-4" /> New patient</button>} />
           </>
         }
       />
@@ -69,9 +58,7 @@ function PatientsPage() {
       </div>
 
       <div className="surface">
-        {isError ? (
-            <QueryErrorState onRetry={() => refetch()} />
-          ) : isLoading ? (
+        {isLoading ? (
           <div className="p-6 space-y-3">
             {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}
           </div>
@@ -80,11 +67,7 @@ function PatientsPage() {
             icon={Users}
             title={search ? "No matching patients" : "No patients yet"}
             description={search ? "Try a different name or MRN." : "Add your first patient to populate the registry."}
-            action={!search && (
-              <Can perm="patients.write">
-                <NewPatientDialog trigger={<button className="btn btn-primary"><Plus className="size-4" /> Add patient</button>} />
-              </Can>
-            )}
+            action={!search && <NewPatientDialog trigger={<button className="btn btn-primary"><Plus className="size-4" /> Add patient</button>} />}
           />
         ) : (
           <table className="w-full text-sm">
@@ -142,17 +125,6 @@ function PatientsPage() {
               ))}
             </tbody>
           </table>
-        )}
-        {!isLoading && !isError && (data ?? []).length >= pageLimit && (
-          <div className="px-5 py-3 border-t border-border text-center">
-            <button
-              onClick={() => setPageLimit((l) => l + 100)}
-              disabled={isFetching}
-              className="btn btn-secondary btn-sm"
-            >
-              {isFetching ? "Loading…" : "Load more patients"}
-            </button>
-          </div>
         )}
       </div>
       <p className="mt-3 text-xs text-muted-foreground flex items-center gap-2">

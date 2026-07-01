@@ -1,5 +1,5 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { useEffect, useRef, useState , lazy, Suspense } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useAuth } from "@/hooks/use-auth";
 import { usePermissions } from "@/lib/rbac";
@@ -16,8 +16,6 @@ import {
   Activity,
   Search,
   Bell,
-  Wallet,
-  Menu,
   Lock,
   FlaskConical,
   UserCog,
@@ -25,10 +23,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CopilotProvider, useCopilot } from "@/components/copilot/CopilotContext";
-import { RouteGuard } from "@/components/rbac/RouteGuard";
-import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
-import { CopilotLauncher } from "@/components/copilot/CopilotLauncher";
-const AICopilot = lazy(() => import("@/components/copilot/AICopilot").then((m) => ({ default: m.AICopilot })));
+import { AICopilot, CopilotLauncher } from "@/components/copilot/AICopilot";
 
 type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; perm?: string };
 const NAV: NavItem[] = [
@@ -39,8 +34,7 @@ const NAV: NavItem[] = [
   { to: "/labs", label: "Lab orders", icon: FlaskConical, perm: "labs.read" },
   { to: "/symptom-checker", label: "AI Symptom Check", icon: Sparkles },
   { to: "/claims", label: "Insurance Claims", icon: Receipt, perm: "claims.read" },
-  { to: "/billing", label: "Billing", icon: Wallet, perm: "billing.read" },
-  { to: "/analytics", label: "Revenue", icon: Activity, perm: "audit.read" },
+  { to: "/analytics", label: "Revenue", icon: Activity },
   { to: "/telemedicine", label: "Telemedicine", icon: Video, perm: "telemedicine.provider" },
   { to: "/compliance", label: "Compliance", icon: ShieldCheck, perm: "compliance.read" },
   { to: "/admin/users", label: "Users & Roles", icon: UserCog, perm: "admin.users" },
@@ -51,14 +45,8 @@ export function AppShell() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const searchRef = useRef<HTMLInputElement>(null);
   const [showHelp, setShowHelp] = useState(false);
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const perms = usePermissions();
   const nav = NAV.filter((n) => !n.perm || perms.has(n.perm as never));
-
-  // Close the mobile drawer whenever the route changes
-  useEffect(() => {
-    setMobileNavOpen(false);
-  }, [pathname]);
 
   // Global keyboard shortcuts: "/" focus search, "?" toggle help, Esc closes help
   useEffect(() => {
@@ -132,55 +120,7 @@ export function AppShell() {
         {/* Main */}
         <main className="flex-1 min-w-0 flex flex-col min-h-screen">
           <header className="sticky top-0 z-30 bg-background/85 backdrop-blur border-b border-border">
-            <div className="flex items-center gap-3 px-4 md:px-7 py-3.5">
-              {/* Mobile navigation drawer — desktop sidebar is unchanged */}
-              <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
-                <SheetTrigger asChild>
-                  <button
-                    className="md:hidden inline-flex items-center justify-center size-10 rounded-lg bg-secondary text-foreground shrink-0"
-                    aria-label="Open navigation menu"
-                  >
-                    <Menu className="size-5" aria-hidden />
-                  </button>
-                </SheetTrigger>
-                <SheetContent side="left" className="w-72 p-0 bg-sidebar border-sidebar-border flex flex-col">
-                  <SheetTitle className="sr-only">Navigation</SheetTitle>
-                  <div className="px-5 py-5 flex items-center gap-2.5 border-b border-sidebar-border">
-                    <div className="size-9 rounded-xl flex items-center justify-center text-primary-foreground" style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-glow)" }}>
-                      <Activity className="size-5" />
-                    </div>
-                    <div>
-                      <div className="font-semibold tracking-tight">HealthOS</div>
-                      <div className="text-[11px] text-muted-foreground -mt-0.5">Practice OS · v1.0</div>
-                    </div>
-                  </div>
-                  <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto" aria-label="Primary mobile">
-                    {nav.map((item) => {
-                      const active = pathname === item.to;
-                      const Icon = item.icon;
-                      return (
-                        <Link
-                          key={item.to}
-                          to={item.to as never}
-                          aria-current={active ? "page" : undefined}
-                          className={cn(
-                            "group relative flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm transition-colors btn-press",
-                            active
-                              ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                              : "text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground",
-                          )}
-                        >
-                          <Icon className={cn("size-4", active && "text-primary")} aria-hidden />
-                          {item.label}
-                        </Link>
-                      );
-                    })}
-                  </nav>
-                  <div className="p-3 border-t border-sidebar-border">
-                    <AccountButton />
-                  </div>
-                </SheetContent>
-              </Sheet>
+            <div className="flex items-center gap-3 px-7 py-3.5">
               <div className="relative flex-1 max-w-md">
                 <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" aria-hidden />
                 <input
@@ -212,9 +152,7 @@ export function AppShell() {
             </div>
           </header>
           <div key={pathname} className="p-7 flex-1 animate-fade-in-up">
-            <RouteGuard>
-              <Outlet />
-            </RouteGuard>
+            <Outlet />
           </div>
           <footer className="border-t border-border px-7 py-4 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
             <div className="flex items-center gap-2">
@@ -237,7 +175,7 @@ export function AppShell() {
         </main>
       </div>
       <CopilotLauncher />
-      <Suspense fallback={null}><AICopilot /></Suspense>
+      <AICopilot />
 
       {showHelp && <ShortcutHelp onClose={() => setShowHelp(false)} />}
     </div>

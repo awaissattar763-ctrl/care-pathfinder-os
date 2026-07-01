@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
 import {
   Video, Lock, ShieldCheck, Clock, ArrowUpRight, CalendarPlus, Users, Signal, Stethoscope,
-  AlertTriangle,
 } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
@@ -10,7 +9,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { NewAppointmentDialog } from "@/components/dialogs/NewAppointmentDialog";
 import { useTelemedicineSessions, useAppointmentsRealtime, type AppointmentWithRefs } from "@/hooks/queries";
 import { cn } from "@/lib/utils";
-import { QueryErrorState } from "@/components/QueryErrorState";
 
 export const Route = createFileRoute("/telemedicine/")({ component: TelemedicineLobby });
 
@@ -28,7 +26,7 @@ function sessionState(a: AppointmentWithRefs): { key: "live" | "joinable" | "upc
 
 function TelemedicineLobby() {
   useAppointmentsRealtime();
-  const { data, isLoading, isError, refetch } = useTelemedicineSessions();
+  const { data, isLoading } = useTelemedicineSessions();
 
   const groups = useMemo(() => {
     const all = data ?? [];
@@ -65,12 +63,7 @@ function TelemedicineLobby() {
           <NewAppointmentDialog
             trigger={
               <button className="btn btn-primary">
-                <CalendarPlus className="size-4" />
-
-      <div className="mb-4 rounded-lg border border-warning/30 bg-warning/10 px-4 py-2.5 text-xs flex items-center gap-2">
-        <AlertTriangle className="size-3.5 text-warning shrink-0" />
-        <span><b>Preview feature.</b> Sessions open in provider-preview mode (local camera only) — two-way patient video is not yet enabled.</span>
-      </div> Schedule session
+                <CalendarPlus className="size-4" /> Schedule session
               </button>
             }
           />
@@ -84,9 +77,7 @@ function TelemedicineLobby() {
         <KpiCard label="Completed" value={stats.completed} icon={Stethoscope} />
       </div>
 
-      {isError ? (
-            <QueryErrorState onRetry={() => refetch()} />
-          ) : isLoading ? (
+      {isLoading ? (
         <div className="grid md:grid-cols-2 gap-4">
           {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-32 rounded-xl" />)}
         </div>

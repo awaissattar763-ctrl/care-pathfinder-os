@@ -3,7 +3,6 @@ import { PageHeader } from "@/components/PageHeader";
 import { ShieldCheck, Lock, FileLock2, Eye, KeyRound, ServerCog } from "lucide-react";
 import { useAuditLogs } from "@/hooks/queries";
 import { Skeleton } from "@/components/ui/skeleton";
-import { QueryErrorState } from "@/components/QueryErrorState";
 
 export const Route = createFileRoute("/compliance")({ component: CompliancePage });
 
@@ -29,7 +28,7 @@ function prettyAction(a: string) {
 }
 
 function CompliancePage() {
-  const { data: logs, isLoading, isError, refetch } = useAuditLogs(30);
+  const { data: logs, isLoading } = useAuditLogs(30);
 
   return (
     <div>
@@ -70,9 +69,7 @@ function CompliancePage() {
           </div>
           <button className="btn btn-ghost btn-sm">Export CSV</button>
         </div>
-        {isError ? (
-            <QueryErrorState onRetry={() => refetch()} />
-          ) : isLoading ? (
+        {isLoading ? (
           <div className="p-5 space-y-3">{[...Array(5)].map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}</div>
         ) : !logs || logs.length === 0 ? (
           <div className="px-5 py-10 text-center text-sm text-muted-foreground">No audit events recorded yet.</div>

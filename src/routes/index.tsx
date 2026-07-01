@@ -17,15 +17,14 @@ import { AIInsightCard } from "@/components/copilot/AIInsightCard";
 import { useDashboardMetrics, useAppointments, useAuditLogs, useTelemedicineSessions } from "@/hooks/queries";
 import { NewAppointmentDialog } from "@/components/dialogs/NewAppointmentDialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { QueryErrorState } from "@/components/QueryErrorState";
 
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
 function Index() {
-  const { data: m, isLoading: metricsLoading, isError: metricsError, refetch: refetchMetrics } = useDashboardMetrics();
-  const { data: appts, isError: apptsError, refetch: refetchAppts } = useAppointments();
+  const { data: m, isLoading: metricsLoading } = useDashboardMetrics();
+  const { data: appts } = useAppointments();
   const { data: audit } = useAuditLogs(5);
   const { data: teleSessions } = useTelemedicineSessions();
 
@@ -67,17 +66,7 @@ function Index() {
         actions={
           <>
             <button className="btn btn-secondary">Print huddle</button>
-            <NewAppointmentDialog trigger={<button className="btn btn-primary">New appointment <ArrowUpRight className="size-4" />
-
-      {(metricsError || apptsError) && (
-        <div className="mb-4">
-          <QueryErrorState
-            compact
-            title="Some dashboard data failed to load"
-            onRetry={() => { refetchMetrics(); refetchAppts(); }}
-          />
-        </div>
-      )}</button>} />
+            <NewAppointmentDialog trigger={<button className="btn btn-primary">New appointment <ArrowUpRight className="size-4" /></button>} />
           </>
         }
       />

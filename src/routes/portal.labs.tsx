@@ -1,16 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMyLabResults } from "@/hooks/portal-queries";
 import { FlaskConical } from "lucide-react";
-import { QueryErrorState } from "@/components/QueryErrorState";
 
 export const Route = createFileRoute("/portal/labs")({ component: PortalLabs });
 
 function PortalLabs() {
-  const { data, isLoading, isError, refetch } = useMyLabResults();
+  const { data, isLoading } = useMyLabResults();
   return (
     <div className="space-y-5">
       <h1 className="text-xl font-semibold tracking-tight flex items-center gap-2"><FlaskConical className="size-5 text-primary" /> Lab results</h1>
-      {isError && <QueryErrorState compact title="Couldn't load your lab results" onRetry={() => refetch()} />}
       {isLoading && <div className="text-sm text-muted-foreground">Loading…</div>}
       {data && data.length === 0 && (
         <div className="rounded-xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">

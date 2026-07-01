@@ -36,29 +36,33 @@ export type LabOrderWithRefs = LabOrder & {
 
 /* ---------------- Patients ---------------- */
 
-const PATIENT_LIST_COLUMNS =
-  "id, name, mrn, dob, sex, urgency, conditions, risk_score, flags, created_at";
-
-export function usePatients(search = "", limit = 100) {
+export function usePatients(search = "") {
   return useQuery({
-    queryKey: ["patients", search, limit],
+    queryKey: ["patients", search],
     queryFn: async () => {
-      let q = supabase
-        .from("patients")
-        .select(PATIENT_LIST_COLUMNS)
-        .order("created_at", { ascending: false })
-        .limit(limit);
+      let q = supabase.from("patients").select("*").order("created_at", { ascending: false });
       if (search.trim()) {
         const s = `%${search.trim()}%`;
         q = q.or(`name.ilike.${s},mrn.ilike.${s},email.ilike.${s}`);
       }
       const { data, error } = await q;
       if (error) throw error;
-      return data as unknown as Patient[];
+      return data as Patient[];
     },
   });
 }
 
+export function usePatient(id: string | undefined) {
+  return useQuery({
+    queryKey: ["patient", id],
+    enabled: !!id,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("patients").select("*").eq("id", id!).maybeSingle();
+      if (error) throw error;
+      return data as Patient | null;
+    },
+  });
+}
 
 export function usePatientDetails(id: string | undefined) {
   return useQuery({
@@ -133,6 +137,23 @@ export function useCreatePatient() {
   });
 }
 
+export function useUpdatePatient() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...patch }: Partial<Patient> & { id: string }) => {
+      const { data, error } = await supabase.from("patients").update(patch).eq("id", id).select().single();
+      if (error) throw error;
+      await logAudit("patient.update", "patient", id, patch as Record<string, unknown>);
+      return data as Patient;
+    },
+    onSuccess: (_d, v) => {
+      qc.invalidateQueries({ queryKey: ["patients"] });
+      qc.invalidateQueries({ queryKey: ["patient", v.id] });
+      toast.success("Patient updated");
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Update failed"),
+  });
+}
 
 /* ---------------- Appointments ---------------- */
 
@@ -143,8 +164,7 @@ export function useAppointments() {
       const { data, error } = await supabase
         .from("appointments")
         .select("*, patient:patients(id,name,mrn,phone,email,urgency), provider:providers(id,name,specialty)")
-        .order("scheduled_at", { ascending: true })
-        .limit(500);
+        .order("scheduled_at", { ascending: true });
       if (error) throw error;
       return data as AppointmentWithRefs[];
     },
@@ -283,8 +303,7 @@ export function usePrescriptions() {
       const { data, error } = await supabase
         .from("prescriptions")
         .select("*, patient:patients(id,name,mrn)")
-        .order("created_at", { ascending: false })
-        .limit(300);
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return data as (Prescription & { patient: Pick<Patient, "id" | "name" | "mrn"> | null })[];
     },
@@ -320,8 +339,7 @@ export function useClaims() {
       const { data, error } = await supabase
         .from("claims")
         .select("*, patient:patients(id,name,mrn)")
-        .order("submitted_at", { ascending: false })
-        .limit(300);
+        .order("submitted_at", { ascending: false });
       if (error) throw error;
       return data as (Claim & { patient: Pick<Patient, "id" | "name" | "mrn"> | null })[];
     },
@@ -666,10 +684,9 @@ export function useLabOrders(patientId?: string) {
     queryFn: async () => {
       let q = supabase
         .from("lab_orders")
-        .select("*, patient:patients(id,name,mrn), provider:providers(id,name), tests:lab_order_tests(*), results:lab_results(*)")
+        .select("*, patient:patients(*), provider:providers(*), tests:lab_order_tests(*), results:lab_results(*)")
         .order("ordered_at", { ascending: false });
       if (patientId) q = q.eq("patient_id", patientId);
-      else q = q.limit(300);
       const { data, error } = await q;
       if (error) throw error;
       return (data ?? []) as unknown as LabOrderWithRefs[];
@@ -677,6 +694,21 @@ export function useLabOrders(patientId?: string) {
   });
 }
 
+export function useLabOrder(id: string | undefined) {
+  return useQuery({
+    queryKey: ["lab_order", id],
+    enabled: !!id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("lab_orders")
+        .select("*, patient:patients(*), provider:providers(*), tests:lab_order_tests(*), results:lab_results(*)")
+        .eq("id", id!)
+        .maybeSingle();
+      if (error) throw error;
+      return data as unknown as LabOrderWithRefs | null;
+    },
+  });
+}
 
 export function useCreateLabOrder() {
   const qc = useQueryClient();
