@@ -6,20 +6,10 @@ import { UrgencyBadge, type Urgency } from "@/components/UrgencyBadge";
 import { usePatients } from "@/hooks/queries";
 import { NewPatientDialog } from "@/components/dialogs/NewPatientDialog";
 import { EmptyState } from "@/components/EmptyState";
-import { Skeleton } from "@/components/ui/skeleton";
+import { TableSkeleton } from "@/components/skeletons";
+import { formatDate, calcAge } from "@/lib/format";
 
 export const Route = createFileRoute("/patients/")({ component: PatientsPage });
-
-function formatDate(d: string | null) {
-  if (!d) return "—";
-  return new Date(d).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
-}
-
-function calcAge(dob: string | null) {
-  if (!dob) return "—";
-  const diff = Date.now() - new Date(dob).getTime();
-  return Math.floor(diff / 3.15576e10);
-}
 
 function PatientsPage() {
   const [search, setSearch] = useState("");
@@ -59,9 +49,7 @@ function PatientsPage() {
 
       <div className="surface">
         {isLoading ? (
-          <div className="p-6 space-y-3">
-            {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}
-          </div>
+          <TableSkeleton rows={6} columns={6} />
         ) : filtered.length === 0 ? (
           <EmptyState
             icon={Users}
