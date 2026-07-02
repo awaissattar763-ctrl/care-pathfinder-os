@@ -37,17 +37,13 @@ import { EmptyState } from "@/components/EmptyState";
 import { ClinicalCopilotPanel } from "@/components/copilot/ClinicalCopilotPanel";
 import { useLabOrders } from "@/hooks/queries";
 import { NewLabOrderDialog } from "@/components/dialogs/NewLabOrderDialog";
+import { formatDate, formatDateTime } from "@/lib/format";
 
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/patients/$patientId")({
   component: PatientProfilePage,
 });
-
-function formatDate(d: string | null | undefined) {
-  if (!d) return "—";
-  return new Date(d).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
-}
 
 function PatientLabOrders({ patientId }: { patientId: string }) {
   const { data, isLoading } = useLabOrders(patientId);
@@ -104,10 +100,6 @@ function PatientLabOrders({ patientId }: { patientId: string }) {
   );
 }
 
-function formatDateTime(d: string | null | undefined) {
-  if (!d) return "—";
-  return new Date(d).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" });
-}
 function calcAge(dob: string | null | undefined) {
   if (!dob) return 0;
   const diff = Date.now() - new Date(dob).getTime();
