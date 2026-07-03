@@ -578,6 +578,19 @@ function PatientProfilePage() {
             </div>
           </SectionCard>
 
+          {/* EMR expansion: problems, histories, immunizations, imaging, growth, care plans, tasks, timeline */}
+          <PatientEmrSections
+            patientId={patient.id}
+            vitals={data.vitals}
+            extraTimelineEvents={timeline.map((t) => ({
+              date: t.date,
+              type: t.type,
+              title: t.title,
+              by: t.by,
+              note: t.note,
+            }))}
+          />
+
           {/* Medications */}
           <SectionCard id="medications" icon={Pill} title="Active medications" description="Reconciled at last visit on May 18, 2026.">
             <div className="overflow-hidden rounded-lg border border-border">
