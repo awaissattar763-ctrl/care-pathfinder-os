@@ -7,3 +7,4 @@ export * from "./labs";
 export * from "./telemedicine";
 export * from "./analytics";
 export * from "./copilot";
+export * from "./emr";

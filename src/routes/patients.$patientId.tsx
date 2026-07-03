@@ -38,6 +38,7 @@ import { ClinicalCopilotPanel } from "@/components/copilot/ClinicalCopilotPanel"
 import { useLabOrders } from "@/hooks/queries";
 import { NewLabOrderDialog } from "@/components/dialogs/NewLabOrderDialog";
 import { formatDate, formatDateTime } from "@/lib/format";
+import { PatientEmrSections } from "@/components/patient/EmrSections";
 
 import { cn } from "@/lib/utils";
 
@@ -217,13 +218,24 @@ const sections = [
   { id: "overview", label: "Overview", icon: User2 },
   { id: "summary", label: "AI Summary", icon: Sparkles },
   { id: "allergies", label: "Allergies & Conditions", icon: AlertTriangle },
+  { id: "problems", label: "Problem list", icon: ClipboardList },
+  { id: "medical-history", label: "Medical history", icon: History },
+  { id: "surgical-history", label: "Surgical history", icon: ClipboardList },
+  { id: "family-history", label: "Family history", icon: User2 },
+  { id: "social-history", label: "Social history", icon: User2 },
+  { id: "immunizations", label: "Immunizations", icon: Sparkles },
   { id: "medications", label: "Medications", icon: Pill },
   { id: "vitals", label: "Vitals", icon: HeartPulse },
+  { id: "growth", label: "Growth charts", icon: TrendingUp },
   { id: "timeline", label: "Medical timeline", icon: History },
+  { id: "clinical-timeline", label: "Clinical timeline", icon: History },
   { id: "labs", label: "Lab reports", icon: FlaskConical },
+  { id: "imaging-history", label: "Imaging history", icon: ImageIcon },
   { id: "scans", label: "Scans & documents", icon: ImageIcon },
   { id: "soap", label: "SOAP notes", icon: ClipboardList },
   { id: "rx", label: "Prescriptions", icon: FileSignature },
+  { id: "care-plans", label: "Care plans", icon: Sparkles },
+  { id: "tasks", label: "Follow-up tasks", icon: ClipboardList },
   { id: "appointments", label: "Appointments", icon: Calendar },
   { id: "audit", label: "Audit access", icon: ShieldCheck },
 ];
@@ -565,6 +577,19 @@ function PatientProfilePage() {
               </div>
             </div>
           </SectionCard>
+
+          {/* EMR expansion: problems, histories, immunizations, imaging, growth, care plans, tasks, timeline */}
+          <PatientEmrSections
+            patientId={patient.id}
+            vitals={data.vitals}
+            extraTimelineEvents={timeline.map((t) => ({
+              date: t.date,
+              type: t.type,
+              title: t.title,
+              by: t.by,
+              note: t.note,
+            }))}
+          />
 
           {/* Medications */}
           <SectionCard id="medications" icon={Pill} title="Active medications" description="Reconciled at last visit on May 18, 2026.">

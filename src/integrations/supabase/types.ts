@@ -148,6 +148,63 @@ export type Database = {
         }
         Relationships: []
       }
+      care_plans: {
+        Row: {
+          created_at: string
+          goal: string | null
+          id: string
+          interventions: string | null
+          owner_provider_id: string | null
+          patient_id: string
+          start_date: string | null
+          status: string | null
+          target_date: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          goal?: string | null
+          id?: string
+          interventions?: string | null
+          owner_provider_id?: string | null
+          patient_id: string
+          start_date?: string | null
+          status?: string | null
+          target_date?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          goal?: string | null
+          id?: string
+          interventions?: string | null
+          owner_provider_id?: string | null
+          patient_id?: string
+          start_date?: string | null
+          status?: string | null
+          target_date?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "care_plans_owner_provider_id_fkey"
+            columns: ["owner_provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "care_plans_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       claims: {
         Row: {
           amount: number
@@ -247,6 +304,216 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "documents_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      family_history: {
+        Row: {
+          age_of_onset: number | null
+          condition: string
+          created_at: string
+          deceased: boolean | null
+          id: string
+          note: string | null
+          patient_id: string
+          relation: string
+          updated_at: string
+        }
+        Insert: {
+          age_of_onset?: number | null
+          condition: string
+          created_at?: string
+          deceased?: boolean | null
+          id?: string
+          note?: string | null
+          patient_id: string
+          relation: string
+          updated_at?: string
+        }
+        Update: {
+          age_of_onset?: number | null
+          condition?: string
+          created_at?: string
+          deceased?: boolean | null
+          id?: string
+          note?: string | null
+          patient_id?: string
+          relation?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_history_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      follow_up_tasks: {
+        Row: {
+          assigned_provider_id: string | null
+          completed_at: string | null
+          created_at: string
+          description: string | null
+          due_date: string | null
+          id: string
+          patient_id: string
+          priority: string | null
+          status: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_provider_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          patient_id: string
+          priority?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_provider_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          patient_id?: string
+          priority?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "follow_up_tasks_assigned_provider_id_fkey"
+            columns: ["assigned_provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "follow_up_tasks_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      imaging_studies: {
+        Row: {
+          body_part: string | null
+          created_at: string
+          facility: string | null
+          id: string
+          impression: string | null
+          modality: string
+          ordered_by: string | null
+          patient_id: string
+          report_url: string | null
+          status: string | null
+          study_date: string | null
+          study_name: string
+          updated_at: string
+        }
+        Insert: {
+          body_part?: string | null
+          created_at?: string
+          facility?: string | null
+          id?: string
+          impression?: string | null
+          modality: string
+          ordered_by?: string | null
+          patient_id: string
+          report_url?: string | null
+          status?: string | null
+          study_date?: string | null
+          study_name: string
+          updated_at?: string
+        }
+        Update: {
+          body_part?: string | null
+          created_at?: string
+          facility?: string | null
+          id?: string
+          impression?: string | null
+          modality?: string
+          ordered_by?: string | null
+          patient_id?: string
+          report_url?: string | null
+          status?: string | null
+          study_date?: string | null
+          study_name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "imaging_studies_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      immunizations: {
+        Row: {
+          administered_by: string | null
+          administered_date: string | null
+          created_at: string
+          dose_number: number | null
+          id: string
+          lot_number: string | null
+          next_due_date: string | null
+          note: string | null
+          patient_id: string
+          site: string | null
+          updated_at: string
+          vaccine: string
+        }
+        Insert: {
+          administered_by?: string | null
+          administered_date?: string | null
+          created_at?: string
+          dose_number?: number | null
+          id?: string
+          lot_number?: string | null
+          next_due_date?: string | null
+          note?: string | null
+          patient_id: string
+          site?: string | null
+          updated_at?: string
+          vaccine: string
+        }
+        Update: {
+          administered_by?: string | null
+          administered_date?: string | null
+          created_at?: string
+          dose_number?: number | null
+          id?: string
+          lot_number?: string | null
+          next_due_date?: string | null
+          note?: string | null
+          patient_id?: string
+          site?: string | null
+          updated_at?: string
+          vaccine?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "immunizations_patient_id_fkey"
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "patients"
@@ -383,6 +650,47 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "lab_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medical_history: {
+        Row: {
+          condition: string
+          created_at: string
+          id: string
+          note: string | null
+          patient_id: string
+          status: string | null
+          updated_at: string
+          year_diagnosed: number | null
+        }
+        Insert: {
+          condition: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          patient_id: string
+          status?: string | null
+          updated_at?: string
+          year_diagnosed?: number | null
+        }
+        Update: {
+          condition?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          patient_id?: string
+          status?: string | null
+          updated_at?: string
+          year_diagnosed?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medical_history_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
             referencedColumns: ["id"]
           },
         ]
@@ -578,6 +886,56 @@ export type Database = {
           },
         ]
       }
+      problems: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          icd10: string | null
+          id: string
+          name: string
+          note: string | null
+          onset_date: string | null
+          patient_id: string
+          resolved_date: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          icd10?: string | null
+          id?: string
+          name: string
+          note?: string | null
+          onset_date?: string | null
+          patient_id: string
+          resolved_date?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          icd10?: string | null
+          id?: string
+          name?: string
+          note?: string | null
+          onset_date?: string | null
+          patient_id?: string
+          resolved_date?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "problems_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       provider_schedules: {
         Row: {
           created_at: string
@@ -711,6 +1069,109 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "soap_notes_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      social_history: {
+        Row: {
+          alcohol_use: string | null
+          created_at: string
+          diet: string | null
+          exercise: string | null
+          id: string
+          living_situation: string | null
+          marital_status: string | null
+          note: string | null
+          occupation: string | null
+          patient_id: string
+          smoking_status: string | null
+          substance_use: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          alcohol_use?: string | null
+          created_at?: string
+          diet?: string | null
+          exercise?: string | null
+          id?: string
+          living_situation?: string | null
+          marital_status?: string | null
+          note?: string | null
+          occupation?: string | null
+          patient_id: string
+          smoking_status?: string | null
+          substance_use?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          alcohol_use?: string | null
+          created_at?: string
+          diet?: string | null
+          exercise?: string | null
+          id?: string
+          living_situation?: string | null
+          marital_status?: string | null
+          note?: string | null
+          occupation?: string | null
+          patient_id?: string
+          smoking_status?: string | null
+          substance_use?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_history_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: true
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      surgical_history: {
+        Row: {
+          created_at: string
+          facility: string | null
+          id: string
+          note: string | null
+          patient_id: string
+          procedure: string
+          procedure_date: string | null
+          surgeon: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          facility?: string | null
+          id?: string
+          note?: string | null
+          patient_id: string
+          procedure: string
+          procedure_date?: string | null
+          surgeon?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          facility?: string | null
+          id?: string
+          note?: string | null
+          patient_id?: string
+          procedure?: string
+          procedure_date?: string | null
+          surgeon?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "surgical_history_patient_id_fkey"
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "patients"
