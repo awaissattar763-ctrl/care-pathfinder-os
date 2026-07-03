@@ -748,7 +748,6 @@ function PatientProfilePage() {
 
           {/* Appointments */}
           <SectionCard id="appointments" icon={Calendar} title="Appointment history">
-            <PatientEmrSectionsWrapper patientId={patient.id} vitalsRaw={data.vitals} timelineEvents={timeline.map((t) => ({ date: t.date, type: t.type, title: t.title, by: t.by, note: t.note }))} />
             <ul className="divide-y divide-border rounded-lg border border-border">
               {appointments.map((a, i) => (
                 <li key={i} className="flex items-center gap-4 px-4 py-3 hover:bg-secondary/40 transition">
