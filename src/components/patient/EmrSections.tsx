@@ -56,7 +56,7 @@ function QuickAddDialog({
 }: {
   title: string;
   fields: FieldSpec[];
-  onSubmit: (values: Record<string, unknown>) => Promise<void> | void;
+  onSubmit: (values: Record<string, unknown>) => Promise<unknown> | unknown;
   triggerLabel?: string;
 }) {
   const [open, setOpen] = useState(false);
