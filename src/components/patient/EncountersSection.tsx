@@ -21,7 +21,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
@@ -816,41 +815,5 @@ function AvsBlock({ title, body }: { title: string; body: string }) {
       </div>
       <div className="text-sm whitespace-pre-wrap mt-0.5">{body}</div>
     </div>
-  );
-}
-
-/* -------------------- Trigger helper (external use) -------------------- */
-
-export function NewEncounterButton({
-  patientId,
-  providerId,
-  trigger,
-}: {
-  patientId: string;
-  providerId?: string | null;
-  trigger: ReactNode;
-}) {
-  const [open, setOpen] = useState(false);
-  return (
-    <>
-      <Dialog open={false}>
-        {/* placeholder to keep imports satisfied */}
-        <DialogTrigger asChild>
-          <span />
-        </DialogTrigger>
-      </Dialog>
-      <span onClick={() => setOpen(true)} className="contents">
-        {trigger}
-      </span>
-      {open && (
-        <EncounterEditorDialog
-          mode="create"
-          patientId={patientId}
-          providerId={providerId ?? null}
-          open={open}
-          onOpenChange={setOpen}
-        />
-      )}
-    </>
   );
 }
