@@ -39,6 +39,7 @@ import { useLabOrders } from "@/hooks/queries";
 import { NewLabOrderDialog } from "@/components/dialogs/NewLabOrderDialog";
 import { formatDate, formatDateTime } from "@/lib/format";
 import { PatientEmrSections } from "@/components/patient/EmrSections";
+import { PatientEncountersSection } from "@/components/patient/EncountersSection";
 
 import { cn } from "@/lib/utils";
 
@@ -217,6 +218,7 @@ const auditTrail = [
 const sections = [
   { id: "overview", label: "Overview", icon: User2 },
   { id: "summary", label: "AI Summary", icon: Sparkles },
+  { id: "encounters", label: "Encounters", icon: Stethoscope },
   { id: "allergies", label: "Allergies & Conditions", icon: AlertTriangle },
   { id: "problems", label: "Problem list", icon: ClipboardList },
   { id: "medical-history", label: "Medical history", icon: History },
@@ -459,9 +461,13 @@ function PatientProfilePage() {
           </div>
 
           <div className="flex flex-col gap-2">
-            <button className="inline-flex items-center gap-2 h-10 px-4 rounded-lg text-sm font-medium text-primary-foreground" style={{ background: "var(--gradient-primary)" }}>
+            <a
+              href="#encounters"
+              className="inline-flex items-center gap-2 h-10 px-4 rounded-lg text-sm font-medium text-primary-foreground"
+              style={{ background: "var(--gradient-primary)" }}
+            >
               <Plus className="size-4" /> New encounter
-            </button>
+            </a>
             <button className="inline-flex items-center gap-2 h-10 px-4 rounded-lg text-sm font-medium border border-border bg-card hover:bg-secondary">
               <Calendar className="size-4" /> Book visit
             </button>
@@ -576,6 +582,16 @@ function PatientProfilePage() {
                 </ul>
               </div>
             </div>
+          </SectionCard>
+
+          {/* Clinical Encounters */}
+          <SectionCard
+            id="encounters"
+            icon={Stethoscope}
+            title="Clinical encounters"
+            description="Structured visits — chief complaint, HPI, ROS, exam, assessment, plan, orders, sign-off."
+          >
+            <PatientEncountersSection patientId={patient.id} providerId={null} />
           </SectionCard>
 
           {/* EMR expansion: problems, histories, immunizations, imaging, growth, care plans, tasks, timeline */}
