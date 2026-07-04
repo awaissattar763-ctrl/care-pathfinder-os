@@ -39,6 +39,8 @@ import { useLabOrders } from "@/hooks/queries";
 import { NewLabOrderDialog } from "@/components/dialogs/NewLabOrderDialog";
 import { formatDate, formatDateTime } from "@/lib/format";
 import { PatientEmrSections } from "@/components/patient/EmrSections";
+import { PatientEncountersSection } from "@/components/patient/EncountersSection";
+import { useState } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -217,6 +219,7 @@ const auditTrail = [
 const sections = [
   { id: "overview", label: "Overview", icon: User2 },
   { id: "summary", label: "AI Summary", icon: Sparkles },
+  { id: "encounters", label: "Encounters", icon: Stethoscope },
   { id: "allergies", label: "Allergies & Conditions", icon: AlertTriangle },
   { id: "problems", label: "Problem list", icon: ClipboardList },
   { id: "medical-history", label: "Medical history", icon: History },
