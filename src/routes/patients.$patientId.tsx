@@ -462,9 +462,13 @@ function PatientProfilePage() {
           </div>
 
           <div className="flex flex-col gap-2">
-            <button className="inline-flex items-center gap-2 h-10 px-4 rounded-lg text-sm font-medium text-primary-foreground" style={{ background: "var(--gradient-primary)" }}>
+            <a
+              href="#encounters"
+              className="inline-flex items-center gap-2 h-10 px-4 rounded-lg text-sm font-medium text-primary-foreground"
+              style={{ background: "var(--gradient-primary)" }}
+            >
               <Plus className="size-4" /> New encounter
-            </button>
+            </a>
             <button className="inline-flex items-center gap-2 h-10 px-4 rounded-lg text-sm font-medium border border-border bg-card hover:bg-secondary">
               <Calendar className="size-4" /> Book visit
             </button>
