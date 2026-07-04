@@ -581,6 +581,16 @@ function PatientProfilePage() {
             </div>
           </SectionCard>
 
+          {/* Clinical Encounters */}
+          <SectionCard
+            id="encounters"
+            icon={Stethoscope}
+            title="Clinical encounters"
+            description="Structured visits — chief complaint, HPI, ROS, exam, assessment, plan, orders, sign-off."
+          >
+            <PatientEncountersSection patientId={patient.id} providerId={null} />
+          </SectionCard>
+
           {/* EMR expansion: problems, histories, immunizations, imaging, growth, care plans, tasks, timeline */}
           <PatientEmrSections
             patientId={patient.id}
