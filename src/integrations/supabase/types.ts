@@ -311,6 +311,180 @@ export type Database = {
           },
         ]
       }
+      encounter_diagnoses: {
+        Row: {
+          code: string | null
+          created_at: string
+          description: string
+          encounter_id: string
+          id: string
+          is_primary: boolean
+          notes: string | null
+        }
+        Insert: {
+          code?: string | null
+          created_at?: string
+          description: string
+          encounter_id: string
+          id?: string
+          is_primary?: boolean
+          notes?: string | null
+        }
+        Update: {
+          code?: string | null
+          created_at?: string
+          description?: string
+          encounter_id?: string
+          id?: string
+          is_primary?: boolean
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "encounter_diagnoses_encounter_id_fkey"
+            columns: ["encounter_id"]
+            isOneToOne: false
+            referencedRelation: "encounters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      encounter_templates: {
+        Row: {
+          assessment_template: string | null
+          chief_complaint: string | null
+          created_at: string
+          created_by: string | null
+          exam: Json
+          hpi_template: string | null
+          id: string
+          name: string
+          plan_template: string | null
+          ros: Json
+          updated_at: string
+          visit_type: string
+        }
+        Insert: {
+          assessment_template?: string | null
+          chief_complaint?: string | null
+          created_at?: string
+          created_by?: string | null
+          exam?: Json
+          hpi_template?: string | null
+          id?: string
+          name: string
+          plan_template?: string | null
+          ros?: Json
+          updated_at?: string
+          visit_type?: string
+        }
+        Update: {
+          assessment_template?: string | null
+          chief_complaint?: string | null
+          created_at?: string
+          created_by?: string | null
+          exam?: Json
+          hpi_template?: string | null
+          id?: string
+          name?: string
+          plan_template?: string | null
+          ros?: Json
+          updated_at?: string
+          visit_type?: string
+        }
+        Relationships: []
+      }
+      encounters: {
+        Row: {
+          appointment_id: string | null
+          assessment: string | null
+          chief_complaint: string | null
+          created_at: string
+          created_by: string | null
+          encounter_date: string
+          exam: Json
+          follow_up_instructions: string | null
+          hpi: string | null
+          id: string
+          locked: boolean
+          patient_id: string
+          plan: string | null
+          provider_id: string | null
+          ros: Json
+          signed_at: string | null
+          signed_by: string | null
+          status: string
+          updated_at: string
+          visit_type: string
+        }
+        Insert: {
+          appointment_id?: string | null
+          assessment?: string | null
+          chief_complaint?: string | null
+          created_at?: string
+          created_by?: string | null
+          encounter_date?: string
+          exam?: Json
+          follow_up_instructions?: string | null
+          hpi?: string | null
+          id?: string
+          locked?: boolean
+          patient_id: string
+          plan?: string | null
+          provider_id?: string | null
+          ros?: Json
+          signed_at?: string | null
+          signed_by?: string | null
+          status?: string
+          updated_at?: string
+          visit_type?: string
+        }
+        Update: {
+          appointment_id?: string | null
+          assessment?: string | null
+          chief_complaint?: string | null
+          created_at?: string
+          created_by?: string | null
+          encounter_date?: string
+          exam?: Json
+          follow_up_instructions?: string | null
+          hpi?: string | null
+          id?: string
+          locked?: boolean
+          patient_id?: string
+          plan?: string | null
+          provider_id?: string | null
+          ros?: Json
+          signed_at?: string | null
+          signed_by?: string | null
+          status?: string
+          updated_at?: string
+          visit_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "encounters_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "encounters_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "encounters_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       family_history: {
         Row: {
           age_of_onset: number | null
