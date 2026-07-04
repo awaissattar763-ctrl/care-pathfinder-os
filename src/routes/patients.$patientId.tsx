@@ -40,7 +40,6 @@ import { NewLabOrderDialog } from "@/components/dialogs/NewLabOrderDialog";
 import { formatDate, formatDateTime } from "@/lib/format";
 import { PatientEmrSections } from "@/components/patient/EmrSections";
 import { PatientEncountersSection } from "@/components/patient/EncountersSection";
-import { useState } from "react";
 
 import { cn } from "@/lib/utils";
 
