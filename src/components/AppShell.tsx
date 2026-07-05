@@ -20,6 +20,7 @@ import {
   FlaskConical,
   UserCog,
   CalendarClock,
+  Wallet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CopilotProvider, useCopilot } from "@/components/copilot/CopilotContext";
@@ -34,6 +35,7 @@ const NAV: NavItem[] = [
   { to: "/labs", label: "Lab orders", icon: FlaskConical, perm: "labs.read" },
   { to: "/symptom-checker", label: "AI Symptom Check", icon: Sparkles },
   { to: "/claims", label: "Insurance Claims", icon: Receipt, perm: "claims.read" },
+  { to: "/billing", label: "Billing", icon: Wallet, perm: "billing.read" },
   { to: "/analytics", label: "Revenue", icon: Activity },
   { to: "/telemedicine", label: "Telemedicine", icon: Video, perm: "telemedicine.provider" },
   { to: "/compliance", label: "Compliance", icon: ShieldCheck, perm: "compliance.read" },

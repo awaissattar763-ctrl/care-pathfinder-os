@@ -100,6 +100,59 @@ export function useMySoapNotes() {
   });
 }
 
+/* -------- Patient billing -------- */
+
+export function useMyInvoices() {
+  const { data: patientId } = useMyPatientId();
+  return useQuery({
+    queryKey: ["my-invoices", patientId],
+    enabled: !!patientId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("invoices")
+        .select("*")
+        .eq("patient_id", patientId!)
+        .order("issued_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
+export function useMyPayments() {
+  const { data: patientId } = useMyPatientId();
+  return useQuery({
+    queryKey: ["my-payments", patientId],
+    enabled: !!patientId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("payments")
+        .select("*")
+        .eq("patient_id", patientId!)
+        .order("received_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
+export function useMyOutstandingBalance() {
+  const { data: patientId } = useMyPatientId();
+  return useQuery({
+    queryKey: ["my-outstanding", patientId],
+    enabled: !!patientId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("invoices")
+        .select("balance_due")
+        .eq("patient_id", patientId!)
+        .in("status", ["Sent", "Overdue", "Draft"]);
+      if (error) throw error;
+      return (data ?? []).reduce((s, i) => s + Number(i.balance_due || 0), 0);
+    },
+  });
+}
+
 /* -------- Conversations / Messages -------- */
 
 export function useConversations(patientId?: string | null) {

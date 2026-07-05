@@ -6,6 +6,7 @@ export type Permission =
   | "prescriptions.read" | "prescriptions.write"
   | "labs.read" | "labs.write" | "labs.result"
   | "claims.read" | "claims.write"
+  | "billing.read" | "billing.write"
   | "telemedicine.join" | "telemedicine.provider"
   | "messages.read" | "messages.write"
   | "admin.users" | "admin.roles" | "admin.schedules"
@@ -19,6 +20,7 @@ const MATRIX: Record<AppRole | "patient" | "lab_tech", Permission[]> = {
     "prescriptions.read","prescriptions.write",
     "labs.read","labs.write","labs.result",
     "claims.read","claims.write",
+    "billing.read","billing.write",
     "telemedicine.join","telemedicine.provider",
     "messages.read","messages.write",
     "admin.users","admin.roles","admin.schedules",
@@ -30,6 +32,7 @@ const MATRIX: Record<AppRole | "patient" | "lab_tech", Permission[]> = {
     "prescriptions.read","prescriptions.write",
     "labs.read","labs.write",
     "claims.read",
+    "billing.read",
     "telemedicine.join","telemedicine.provider",
     "messages.read","messages.write",
     "audit.read",
@@ -45,6 +48,7 @@ const MATRIX: Record<AppRole | "patient" | "lab_tech", Permission[]> = {
     "patients.read","patients.write",
     "appointments.read","appointments.write",
     "claims.read","claims.write",
+    "billing.read","billing.write",
     "messages.read",
   ],
   lab_tech: [
