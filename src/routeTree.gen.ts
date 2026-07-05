@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SymptomCheckerRouteImport } from './routes/symptom-checker'
 import { Route as PrescriptionsRouteImport } from './routes/prescriptions'
 import { Route as PortalRouteImport } from './routes/portal'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as LabsRouteImport } from './routes/labs'
 import { Route as ComplianceRouteImport } from './routes/compliance'
 import { Route as ClaimsRouteImport } from './routes/claims'
@@ -31,6 +32,9 @@ import { Route as PatientsPatientIdRouteImport } from './routes/patients.$patien
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminSchedulesRouteImport } from './routes/admin.schedules'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 
 const SymptomCheckerRoute = SymptomCheckerRouteImport.update({
   id: '/symptom-checker',
@@ -45,6 +49,11 @@ const PrescriptionsRoute = PrescriptionsRouteImport.update({
 const PortalRoute = PortalRouteImport.update({
   id: '/portal',
   path: '/portal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LabsRoute = LabsRouteImport.update({
@@ -143,6 +152,24 @@ const AdminSchedulesRoute = AdminSchedulesRouteImport.update({
   path: '/admin/schedules',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotmcpChar93InvokeToolToolRoute =
+  Char91DotmcpChar93InvokeToolToolRouteImport.update({
+    id: '/.mcp/invoke-tool/$tool',
+    path: '/.mcp/invoke-tool/$tool',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -151,9 +178,12 @@ export interface FileRoutesByFullPath {
   '/claims': typeof ClaimsRoute
   '/compliance': typeof ComplianceRoute
   '/labs': typeof LabsRoute
+  '/mcp': typeof McpRoute
   '/portal': typeof PortalRouteWithChildren
   '/prescriptions': typeof PrescriptionsRoute
   '/symptom-checker': typeof SymptomCheckerRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/schedules': typeof AdminSchedulesRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
@@ -167,6 +197,7 @@ export interface FileRoutesByFullPath {
   '/patients/': typeof PatientsIndexRoute
   '/portal/': typeof PortalIndexRoute
   '/telemedicine/': typeof TelemedicineIndexRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -175,8 +206,11 @@ export interface FileRoutesByTo {
   '/claims': typeof ClaimsRoute
   '/compliance': typeof ComplianceRoute
   '/labs': typeof LabsRoute
+  '/mcp': typeof McpRoute
   '/prescriptions': typeof PrescriptionsRoute
   '/symptom-checker': typeof SymptomCheckerRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/schedules': typeof AdminSchedulesRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
@@ -190,6 +224,7 @@ export interface FileRoutesByTo {
   '/patients': typeof PatientsIndexRoute
   '/portal': typeof PortalIndexRoute
   '/telemedicine': typeof TelemedicineIndexRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -199,9 +234,12 @@ export interface FileRoutesById {
   '/claims': typeof ClaimsRoute
   '/compliance': typeof ComplianceRoute
   '/labs': typeof LabsRoute
+  '/mcp': typeof McpRoute
   '/portal': typeof PortalRouteWithChildren
   '/prescriptions': typeof PrescriptionsRoute
   '/symptom-checker': typeof SymptomCheckerRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/schedules': typeof AdminSchedulesRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
@@ -215,6 +253,7 @@ export interface FileRoutesById {
   '/patients/': typeof PatientsIndexRoute
   '/portal/': typeof PortalIndexRoute
   '/telemedicine/': typeof TelemedicineIndexRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -225,9 +264,12 @@ export interface FileRouteTypes {
     | '/claims'
     | '/compliance'
     | '/labs'
+    | '/mcp'
     | '/portal'
     | '/prescriptions'
     | '/symptom-checker'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin/schedules'
     | '/admin/users'
     | '/api/chat'
@@ -241,6 +283,7 @@ export interface FileRouteTypes {
     | '/patients/'
     | '/portal/'
     | '/telemedicine/'
+    | '/.mcp/invoke-tool/$tool'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -249,8 +292,11 @@ export interface FileRouteTypes {
     | '/claims'
     | '/compliance'
     | '/labs'
+    | '/mcp'
     | '/prescriptions'
     | '/symptom-checker'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin/schedules'
     | '/admin/users'
     | '/api/chat'
@@ -264,6 +310,7 @@ export interface FileRouteTypes {
     | '/patients'
     | '/portal'
     | '/telemedicine'
+    | '/.mcp/invoke-tool/$tool'
   id:
     | '__root__'
     | '/'
@@ -272,9 +319,12 @@ export interface FileRouteTypes {
     | '/claims'
     | '/compliance'
     | '/labs'
+    | '/mcp'
     | '/portal'
     | '/prescriptions'
     | '/symptom-checker'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin/schedules'
     | '/admin/users'
     | '/api/chat'
@@ -288,6 +338,7 @@ export interface FileRouteTypes {
     | '/patients/'
     | '/portal/'
     | '/telemedicine/'
+    | '/.mcp/invoke-tool/$tool'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -297,9 +348,12 @@ export interface RootRouteChildren {
   ClaimsRoute: typeof ClaimsRoute
   ComplianceRoute: typeof ComplianceRoute
   LabsRoute: typeof LabsRoute
+  McpRoute: typeof McpRoute
   PortalRoute: typeof PortalRouteWithChildren
   PrescriptionsRoute: typeof PrescriptionsRoute
   SymptomCheckerRoute: typeof SymptomCheckerRoute
+  Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   AdminSchedulesRoute: typeof AdminSchedulesRoute
   AdminUsersRoute: typeof AdminUsersRoute
   ApiChatRoute: typeof ApiChatRoute
@@ -307,6 +361,7 @@ export interface RootRouteChildren {
   TelemedicineAppointmentIdRoute: typeof TelemedicineAppointmentIdRoute
   PatientsIndexRoute: typeof PatientsIndexRoute
   TelemedicineIndexRoute: typeof TelemedicineIndexRoute
+  Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -330,6 +385,13 @@ declare module '@tanstack/react-router' {
       path: '/portal'
       fullPath: '/portal'
       preLoaderRoute: typeof PortalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/labs': {
@@ -465,6 +527,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSchedulesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/list-tools': {
+      id: '/.mcp/list-tools'
+      path: '/.mcp/list-tools'
+      fullPath: '/.mcp/list-tools'
+      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -496,9 +579,13 @@ const rootRouteChildren: RootRouteChildren = {
   ClaimsRoute: ClaimsRoute,
   ComplianceRoute: ComplianceRoute,
   LabsRoute: LabsRoute,
+  McpRoute: McpRoute,
   PortalRoute: PortalRouteWithChildren,
   PrescriptionsRoute: PrescriptionsRoute,
   SymptomCheckerRoute: SymptomCheckerRoute,
+  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   AdminSchedulesRoute: AdminSchedulesRoute,
   AdminUsersRoute: AdminUsersRoute,
   ApiChatRoute: ApiChatRoute,
@@ -506,6 +593,7 @@ const rootRouteChildren: RootRouteChildren = {
   TelemedicineAppointmentIdRoute: TelemedicineAppointmentIdRoute,
   PatientsIndexRoute: PatientsIndexRoute,
   TelemedicineIndexRoute: TelemedicineIndexRoute,
+  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
