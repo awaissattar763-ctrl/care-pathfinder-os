@@ -16,6 +16,7 @@ import { Route as McpRouteImport } from './routes/mcp'
 import { Route as LabsRouteImport } from './routes/labs'
 import { Route as ComplianceRouteImport } from './routes/compliance'
 import { Route as ClaimsRouteImport } from './routes/claims'
+import { Route as BillingRouteImport } from './routes/billing'
 import { Route as AppointmentsRouteImport } from './routes/appointments'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as IndexRouteImport } from './routes/index'
@@ -27,8 +28,10 @@ import { Route as PortalProfileRouteImport } from './routes/portal.profile'
 import { Route as PortalPrescriptionsRouteImport } from './routes/portal.prescriptions'
 import { Route as PortalMessagesRouteImport } from './routes/portal.messages'
 import { Route as PortalLabsRouteImport } from './routes/portal.labs'
+import { Route as PortalBillingRouteImport } from './routes/portal.billing'
 import { Route as PortalAppointmentsRouteImport } from './routes/portal.appointments'
 import { Route as PatientsPatientIdRouteImport } from './routes/patients.$patientId'
+import { Route as BillingInvoiceIdRouteImport } from './routes/billing.$invoiceId'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminSchedulesRouteImport } from './routes/admin.schedules'
@@ -69,6 +72,11 @@ const ComplianceRoute = ComplianceRouteImport.update({
 const ClaimsRoute = ClaimsRouteImport.update({
   id: '/claims',
   path: '/claims',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BillingRoute = BillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppointmentsRoute = AppointmentsRouteImport.update({
@@ -127,6 +135,11 @@ const PortalLabsRoute = PortalLabsRouteImport.update({
   path: '/labs',
   getParentRoute: () => PortalRoute,
 } as any)
+const PortalBillingRoute = PortalBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
+  getParentRoute: () => PortalRoute,
+} as any)
 const PortalAppointmentsRoute = PortalAppointmentsRouteImport.update({
   id: '/appointments',
   path: '/appointments',
@@ -136,6 +149,11 @@ const PatientsPatientIdRoute = PatientsPatientIdRouteImport.update({
   id: '/patients/$patientId',
   path: '/patients/$patientId',
   getParentRoute: () => rootRouteImport,
+} as any)
+const BillingInvoiceIdRoute = BillingInvoiceIdRouteImport.update({
+  id: '/$invoiceId',
+  path: '/$invoiceId',
+  getParentRoute: () => BillingRoute,
 } as any)
 const ApiChatRoute = ApiChatRouteImport.update({
   id: '/api/chat',
@@ -175,6 +193,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/analytics': typeof AnalyticsRoute
   '/appointments': typeof AppointmentsRoute
+  '/billing': typeof BillingRouteWithChildren
   '/claims': typeof ClaimsRoute
   '/compliance': typeof ComplianceRoute
   '/labs': typeof LabsRoute
@@ -187,8 +206,10 @@ export interface FileRoutesByFullPath {
   '/admin/schedules': typeof AdminSchedulesRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
+  '/billing/$invoiceId': typeof BillingInvoiceIdRoute
   '/patients/$patientId': typeof PatientsPatientIdRoute
   '/portal/appointments': typeof PortalAppointmentsRoute
+  '/portal/billing': typeof PortalBillingRoute
   '/portal/labs': typeof PortalLabsRoute
   '/portal/messages': typeof PortalMessagesRoute
   '/portal/prescriptions': typeof PortalPrescriptionsRoute
@@ -203,6 +224,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/analytics': typeof AnalyticsRoute
   '/appointments': typeof AppointmentsRoute
+  '/billing': typeof BillingRouteWithChildren
   '/claims': typeof ClaimsRoute
   '/compliance': typeof ComplianceRoute
   '/labs': typeof LabsRoute
@@ -214,8 +236,10 @@ export interface FileRoutesByTo {
   '/admin/schedules': typeof AdminSchedulesRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
+  '/billing/$invoiceId': typeof BillingInvoiceIdRoute
   '/patients/$patientId': typeof PatientsPatientIdRoute
   '/portal/appointments': typeof PortalAppointmentsRoute
+  '/portal/billing': typeof PortalBillingRoute
   '/portal/labs': typeof PortalLabsRoute
   '/portal/messages': typeof PortalMessagesRoute
   '/portal/prescriptions': typeof PortalPrescriptionsRoute
@@ -231,6 +255,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/analytics': typeof AnalyticsRoute
   '/appointments': typeof AppointmentsRoute
+  '/billing': typeof BillingRouteWithChildren
   '/claims': typeof ClaimsRoute
   '/compliance': typeof ComplianceRoute
   '/labs': typeof LabsRoute
@@ -243,8 +268,10 @@ export interface FileRoutesById {
   '/admin/schedules': typeof AdminSchedulesRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
+  '/billing/$invoiceId': typeof BillingInvoiceIdRoute
   '/patients/$patientId': typeof PatientsPatientIdRoute
   '/portal/appointments': typeof PortalAppointmentsRoute
+  '/portal/billing': typeof PortalBillingRoute
   '/portal/labs': typeof PortalLabsRoute
   '/portal/messages': typeof PortalMessagesRoute
   '/portal/prescriptions': typeof PortalPrescriptionsRoute
@@ -261,6 +288,7 @@ export interface FileRouteTypes {
     | '/'
     | '/analytics'
     | '/appointments'
+    | '/billing'
     | '/claims'
     | '/compliance'
     | '/labs'
@@ -273,8 +301,10 @@ export interface FileRouteTypes {
     | '/admin/schedules'
     | '/admin/users'
     | '/api/chat'
+    | '/billing/$invoiceId'
     | '/patients/$patientId'
     | '/portal/appointments'
+    | '/portal/billing'
     | '/portal/labs'
     | '/portal/messages'
     | '/portal/prescriptions'
@@ -289,6 +319,7 @@ export interface FileRouteTypes {
     | '/'
     | '/analytics'
     | '/appointments'
+    | '/billing'
     | '/claims'
     | '/compliance'
     | '/labs'
@@ -300,8 +331,10 @@ export interface FileRouteTypes {
     | '/admin/schedules'
     | '/admin/users'
     | '/api/chat'
+    | '/billing/$invoiceId'
     | '/patients/$patientId'
     | '/portal/appointments'
+    | '/portal/billing'
     | '/portal/labs'
     | '/portal/messages'
     | '/portal/prescriptions'
@@ -316,6 +349,7 @@ export interface FileRouteTypes {
     | '/'
     | '/analytics'
     | '/appointments'
+    | '/billing'
     | '/claims'
     | '/compliance'
     | '/labs'
@@ -328,8 +362,10 @@ export interface FileRouteTypes {
     | '/admin/schedules'
     | '/admin/users'
     | '/api/chat'
+    | '/billing/$invoiceId'
     | '/patients/$patientId'
     | '/portal/appointments'
+    | '/portal/billing'
     | '/portal/labs'
     | '/portal/messages'
     | '/portal/prescriptions'
@@ -345,6 +381,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AnalyticsRoute: typeof AnalyticsRoute
   AppointmentsRoute: typeof AppointmentsRoute
+  BillingRoute: typeof BillingRouteWithChildren
   ClaimsRoute: typeof ClaimsRoute
   ComplianceRoute: typeof ComplianceRoute
   LabsRoute: typeof LabsRoute
@@ -413,6 +450,13 @@ declare module '@tanstack/react-router' {
       path: '/claims'
       fullPath: '/claims'
       preLoaderRoute: typeof ClaimsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/billing': {
+      id: '/billing'
+      path: '/billing'
+      fullPath: '/billing'
+      preLoaderRoute: typeof BillingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/appointments': {
@@ -492,6 +536,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalLabsRouteImport
       parentRoute: typeof PortalRoute
     }
+    '/portal/billing': {
+      id: '/portal/billing'
+      path: '/billing'
+      fullPath: '/portal/billing'
+      preLoaderRoute: typeof PortalBillingRouteImport
+      parentRoute: typeof PortalRoute
+    }
     '/portal/appointments': {
       id: '/portal/appointments'
       path: '/appointments'
@@ -505,6 +556,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/patients/$patientId'
       preLoaderRoute: typeof PatientsPatientIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/billing/$invoiceId': {
+      id: '/billing/$invoiceId'
+      path: '/$invoiceId'
+      fullPath: '/billing/$invoiceId'
+      preLoaderRoute: typeof BillingInvoiceIdRouteImport
+      parentRoute: typeof BillingRoute
     }
     '/api/chat': {
       id: '/api/chat'
@@ -551,8 +609,20 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface BillingRouteChildren {
+  BillingInvoiceIdRoute: typeof BillingInvoiceIdRoute
+}
+
+const BillingRouteChildren: BillingRouteChildren = {
+  BillingInvoiceIdRoute: BillingInvoiceIdRoute,
+}
+
+const BillingRouteWithChildren =
+  BillingRoute._addFileChildren(BillingRouteChildren)
+
 interface PortalRouteChildren {
   PortalAppointmentsRoute: typeof PortalAppointmentsRoute
+  PortalBillingRoute: typeof PortalBillingRoute
   PortalLabsRoute: typeof PortalLabsRoute
   PortalMessagesRoute: typeof PortalMessagesRoute
   PortalPrescriptionsRoute: typeof PortalPrescriptionsRoute
@@ -562,6 +632,7 @@ interface PortalRouteChildren {
 
 const PortalRouteChildren: PortalRouteChildren = {
   PortalAppointmentsRoute: PortalAppointmentsRoute,
+  PortalBillingRoute: PortalBillingRoute,
   PortalLabsRoute: PortalLabsRoute,
   PortalMessagesRoute: PortalMessagesRoute,
   PortalPrescriptionsRoute: PortalPrescriptionsRoute,
@@ -576,6 +647,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AnalyticsRoute: AnalyticsRoute,
   AppointmentsRoute: AppointmentsRoute,
+  BillingRoute: BillingRouteWithChildren,
   ClaimsRoute: ClaimsRoute,
   ComplianceRoute: ComplianceRoute,
   LabsRoute: LabsRoute,
