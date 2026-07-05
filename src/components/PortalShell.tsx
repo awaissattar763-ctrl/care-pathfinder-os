@@ -1,5 +1,5 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { Activity, CalendarDays, FlaskConical, FileText, MessageSquare, User, LogOut, Home, ShieldCheck } from "lucide-react";
+import { Activity, CalendarDays, FlaskConical, FileText, MessageSquare, User, LogOut, Home, ShieldCheck, Wallet } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 
@@ -9,6 +9,7 @@ const nav: NavItem[] = [
   { to: "/portal/appointments", label: "Visits", icon: CalendarDays },
   { to: "/portal/labs", label: "Labs", icon: FlaskConical },
   { to: "/portal/prescriptions", label: "Rx", icon: FileText },
+  { to: "/portal/billing", label: "Billing", icon: Wallet },
   { to: "/portal/messages", label: "Messages", icon: MessageSquare },
   { to: "/portal/profile", label: "Profile", icon: User },
 ];
@@ -77,7 +78,7 @@ export function PortalShell() {
         className="md:hidden fixed bottom-0 inset-x-0 z-30 bg-background/95 backdrop-blur border-t border-border safe-area-inset-bottom"
         aria-label="Patient navigation"
       >
-        <div className="grid grid-cols-6">
+        <div className="grid grid-cols-7">
           {nav.map((item) => {
             const Icon = item.icon;
             const active = isActive(item);

@@ -4,17 +4,21 @@ import { Receipt } from "lucide-react";
 import { useClaims, useUpdateClaimStatus } from "@/hooks/queries";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/EmptyState";
+import { CLAIM_STATUSES } from "@/lib/constants";
 
 export const Route = createFileRoute("/claims")({ component: ClaimsPage });
 
 const tone: Record<string, string> = {
   Approved: "pill pill--success",
+  Paid: "pill pill--success",
   "In review": "pill pill--warning",
+  Pending: "pill pill--warning",
+  Appealed: "pill pill--warning",
   Submitted: "pill pill--info",
   Denied: "pill pill--danger",
 };
 
-const statusOptions = ["Submitted", "In review", "Approved", "Denied"];
+const statusOptions = CLAIM_STATUSES;
 
 function ClaimsPage() {
   const { data: claims, isLoading } = useClaims();
