@@ -24,6 +24,7 @@ import { Route as TelemedicineIndexRouteImport } from './routes/telemedicine.ind
 import { Route as PortalIndexRouteImport } from './routes/portal.index'
 import { Route as PatientsIndexRouteImport } from './routes/patients.index'
 import { Route as TelemedicineAppointmentIdRouteImport } from './routes/telemedicine.$appointmentId'
+import { Route as SettingsOrganizationRouteImport } from './routes/settings.organization'
 import { Route as PortalProfileRouteImport } from './routes/portal.profile'
 import { Route as PortalPrescriptionsRouteImport } from './routes/portal.prescriptions'
 import { Route as PortalMessagesRouteImport } from './routes/portal.messages'
@@ -115,6 +116,11 @@ const TelemedicineAppointmentIdRoute =
     path: '/telemedicine/$appointmentId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const SettingsOrganizationRoute = SettingsOrganizationRouteImport.update({
+  id: '/settings/organization',
+  path: '/settings/organization',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PortalProfileRoute = PortalProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -214,6 +220,7 @@ export interface FileRoutesByFullPath {
   '/portal/messages': typeof PortalMessagesRoute
   '/portal/prescriptions': typeof PortalPrescriptionsRoute
   '/portal/profile': typeof PortalProfileRoute
+  '/settings/organization': typeof SettingsOrganizationRoute
   '/telemedicine/$appointmentId': typeof TelemedicineAppointmentIdRoute
   '/patients/': typeof PatientsIndexRoute
   '/portal/': typeof PortalIndexRoute
@@ -244,6 +251,7 @@ export interface FileRoutesByTo {
   '/portal/messages': typeof PortalMessagesRoute
   '/portal/prescriptions': typeof PortalPrescriptionsRoute
   '/portal/profile': typeof PortalProfileRoute
+  '/settings/organization': typeof SettingsOrganizationRoute
   '/telemedicine/$appointmentId': typeof TelemedicineAppointmentIdRoute
   '/patients': typeof PatientsIndexRoute
   '/portal': typeof PortalIndexRoute
@@ -276,6 +284,7 @@ export interface FileRoutesById {
   '/portal/messages': typeof PortalMessagesRoute
   '/portal/prescriptions': typeof PortalPrescriptionsRoute
   '/portal/profile': typeof PortalProfileRoute
+  '/settings/organization': typeof SettingsOrganizationRoute
   '/telemedicine/$appointmentId': typeof TelemedicineAppointmentIdRoute
   '/patients/': typeof PatientsIndexRoute
   '/portal/': typeof PortalIndexRoute
@@ -309,6 +318,7 @@ export interface FileRouteTypes {
     | '/portal/messages'
     | '/portal/prescriptions'
     | '/portal/profile'
+    | '/settings/organization'
     | '/telemedicine/$appointmentId'
     | '/patients/'
     | '/portal/'
@@ -339,6 +349,7 @@ export interface FileRouteTypes {
     | '/portal/messages'
     | '/portal/prescriptions'
     | '/portal/profile'
+    | '/settings/organization'
     | '/telemedicine/$appointmentId'
     | '/patients'
     | '/portal'
@@ -370,6 +381,7 @@ export interface FileRouteTypes {
     | '/portal/messages'
     | '/portal/prescriptions'
     | '/portal/profile'
+    | '/settings/organization'
     | '/telemedicine/$appointmentId'
     | '/patients/'
     | '/portal/'
@@ -395,6 +407,7 @@ export interface RootRouteChildren {
   AdminUsersRoute: typeof AdminUsersRoute
   ApiChatRoute: typeof ApiChatRoute
   PatientsPatientIdRoute: typeof PatientsPatientIdRoute
+  SettingsOrganizationRoute: typeof SettingsOrganizationRoute
   TelemedicineAppointmentIdRoute: typeof TelemedicineAppointmentIdRoute
   PatientsIndexRoute: typeof PatientsIndexRoute
   TelemedicineIndexRoute: typeof TelemedicineIndexRoute
@@ -506,6 +519,13 @@ declare module '@tanstack/react-router' {
       path: '/telemedicine/$appointmentId'
       fullPath: '/telemedicine/$appointmentId'
       preLoaderRoute: typeof TelemedicineAppointmentIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings/organization': {
+      id: '/settings/organization'
+      path: '/settings/organization'
+      fullPath: '/settings/organization'
+      preLoaderRoute: typeof SettingsOrganizationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/portal/profile': {
@@ -662,6 +682,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminUsersRoute: AdminUsersRoute,
   ApiChatRoute: ApiChatRoute,
   PatientsPatientIdRoute: PatientsPatientIdRoute,
+  SettingsOrganizationRoute: SettingsOrganizationRoute,
   TelemedicineAppointmentIdRoute: TelemedicineAppointmentIdRoute,
   PatientsIndexRoute: PatientsIndexRoute,
   TelemedicineIndexRoute: TelemedicineIndexRoute,

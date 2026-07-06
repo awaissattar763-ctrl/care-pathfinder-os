@@ -10,3 +10,4 @@ export * from "./copilot";
 export * from "./emr";
 export * from "./encounters";
 export * from "./billing";
+export * from "./tenant";
