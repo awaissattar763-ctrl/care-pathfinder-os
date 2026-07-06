@@ -25,7 +25,7 @@ export type Database = {
           severity: string
         }
         Insert: {
-          clinic_id: string
+          clinic_id?: string
           created_at?: string
           id?: string
           name: string
@@ -80,7 +80,7 @@ export type Database = {
           visit_type: string
         }
         Insert: {
-          clinic_id: string
+          clinic_id?: string
           created_at?: string
           department_id?: string | null
           duration_min?: number
@@ -205,7 +205,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          clinic_id: string
+          clinic_id?: string
           created_at?: string
           goal?: string | null
           id?: string
@@ -280,7 +280,7 @@ export type Database = {
           amount?: number
           appeal_notes?: string | null
           claim_number?: string
-          clinic_id: string
+          clinic_id?: string
           denial_reason?: string | null
           id?: string
           invoice_id?: string | null
@@ -437,7 +437,7 @@ export type Database = {
           subject: string
         }
         Insert: {
-          clinic_id: string
+          clinic_id?: string
           created_at?: string
           id?: string
           last_message_at?: string
@@ -480,7 +480,7 @@ export type Database = {
         }
         Insert: {
           amount: number
-          clinic_id: string
+          clinic_id?: string
           created_at?: string
           created_by?: string | null
           credit_number?: string
@@ -575,7 +575,7 @@ export type Database = {
           uploaded_at: string
         }
         Insert: {
-          clinic_id: string
+          clinic_id?: string
           date?: string | null
           id?: string
           modality?: string | null
@@ -623,7 +623,7 @@ export type Database = {
           notes: string | null
         }
         Insert: {
-          clinic_id: string
+          clinic_id?: string
           code?: string | null
           created_at?: string
           description: string
@@ -678,7 +678,7 @@ export type Database = {
         Insert: {
           assessment_template?: string | null
           chief_complaint?: string | null
-          clinic_id: string
+          clinic_id?: string
           created_at?: string
           created_by?: string | null
           exam?: Json
@@ -744,7 +744,7 @@ export type Database = {
           appointment_id?: string | null
           assessment?: string | null
           chief_complaint?: string | null
-          clinic_id: string
+          clinic_id?: string
           created_at?: string
           created_by?: string | null
           department_id?: string | null
@@ -841,7 +841,7 @@ export type Database = {
         }
         Insert: {
           age_of_onset?: number | null
-          clinic_id: string
+          clinic_id?: string
           condition: string
           created_at?: string
           deceased?: boolean | null
@@ -921,7 +921,7 @@ export type Database = {
         }
         Insert: {
           assigned_provider_id?: string | null
-          clinic_id: string
+          clinic_id?: string
           completed_at?: string | null
           created_at?: string
           description?: string | null
@@ -990,7 +990,7 @@ export type Database = {
         }
         Insert: {
           body_part?: string | null
-          clinic_id: string
+          clinic_id?: string
           created_at?: string
           facility?: string | null
           id?: string
@@ -1056,7 +1056,7 @@ export type Database = {
         Insert: {
           administered_by?: string | null
           administered_date?: string | null
-          clinic_id: string
+          clinic_id?: string
           created_at?: string
           dose_number?: number | null
           id?: string
@@ -1115,7 +1115,7 @@ export type Database = {
         }
         Insert: {
           amount?: number
-          clinic_id: string
+          clinic_id?: string
           created_at?: string
           description: string
           id?: string
@@ -1176,7 +1176,7 @@ export type Database = {
         }
         Insert: {
           balance_due?: number
-          clinic_id: string
+          clinic_id?: string
           created_at?: string
           created_by?: string | null
           discount?: number
@@ -1246,7 +1246,7 @@ export type Database = {
           test_name: string
         }
         Insert: {
-          clinic_id: string
+          clinic_id?: string
           created_at?: string
           id?: string
           order_id: string
@@ -1296,7 +1296,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          clinic_id: string
+          clinic_id?: string
           clinical_notes?: string | null
           collected_at?: string | null
           created_at?: string
@@ -1354,7 +1354,7 @@ export type Database = {
           value: string
         }
         Insert: {
-          clinic_id: string
+          clinic_id?: string
           created_at?: string
           flag?: string
           id?: string
@@ -1413,7 +1413,7 @@ export type Database = {
           year_diagnosed: number | null
         }
         Insert: {
-          clinic_id: string
+          clinic_id?: string
           condition: string
           created_at?: string
           id?: string
@@ -1466,7 +1466,7 @@ export type Database = {
         Insert: {
           attachments?: Json
           body: string
-          clinic_id: string
+          clinic_id?: string
           conversation_id: string
           created_at?: string
           id?: string
@@ -1656,7 +1656,7 @@ export type Database = {
           address?: string | null
           ai_summary?: Json | null
           blood_group?: string | null
-          clinic_id: string
+          clinic_id?: string
           conditions?: string[]
           created_at?: string
           created_by?: string | null
@@ -1733,7 +1733,7 @@ export type Database = {
         }
         Insert: {
           amount: number
-          clinic_id: string
+          clinic_id?: string
           created_at?: string
           created_by?: string | null
           id?: string
@@ -1797,7 +1797,7 @@ export type Database = {
           status: string
         }
         Insert: {
-          clinic_id: string
+          clinic_id?: string
           created_at?: string
           drug: string
           id?: string
@@ -1864,7 +1864,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          clinic_id: string
+          clinic_id?: string
           created_at?: string
           created_by?: string | null
           icd10?: string | null
@@ -1923,7 +1923,7 @@ export type Database = {
           weekday: number | null
         }
         Insert: {
-          clinic_id: string
+          clinic_id?: string
           created_at?: string
           end_minute?: number | null
           ends_at?: string | null
@@ -1971,7 +1971,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
-          clinic_id: string
+          clinic_id?: string
           created_at?: string
           department_id?: string | null
           email?: string | null
@@ -2021,7 +2021,7 @@ export type Database = {
         }
         Insert: {
           active?: boolean
-          clinic_id: string
+          clinic_id?: string
           color?: string | null
           created_at?: string
           id?: string
@@ -2063,7 +2063,7 @@ export type Database = {
         Insert: {
           a?: string | null
           author: string
-          clinic_id: string
+          clinic_id?: string
           created_at?: string
           date?: string
           id?: string
@@ -2121,7 +2121,7 @@ export type Database = {
         }
         Insert: {
           alcohol_use?: string | null
-          clinic_id: string
+          clinic_id?: string
           created_at?: string
           diet?: string | null
           exercise?: string | null
@@ -2211,7 +2211,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          clinic_id: string
+          clinic_id?: string
           created_at?: string
           facility?: string | null
           id?: string
@@ -2342,7 +2342,7 @@ export type Database = {
           value: string
         }
         Insert: {
-          clinic_id: string
+          clinic_id?: string
           created_at?: string
           id?: string
           label: string
@@ -2400,7 +2400,7 @@ export type Database = {
           visit_type: string
         }
         Insert: {
-          clinic_id: string
+          clinic_id?: string
           created_at?: string
           duration_min?: number
           id?: string
