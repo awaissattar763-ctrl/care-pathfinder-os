@@ -25,9 +25,13 @@ import {
 import { cn } from "@/lib/utils";
 import { CopilotProvider, useCopilot } from "@/components/copilot/CopilotContext";
 import { AICopilot, CopilotLauncher } from "@/components/copilot/AICopilot";
+import { ClinicSwitcher } from "@/components/ClinicSwitcher";
+import { useOrgFeatureFlags } from "@/hooks/queries/tenant";
+import { Building2 } from "lucide-react";
 
 type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; perm?: string };
-const NAV: NavItem[] = [
+type NavItemDef = NavItem & { feature?: string };
+const NAV: NavItemDef[] = [
   { to: "/", label: "Overview", icon: LayoutDashboard },
   { to: "/patients", label: "Patients", icon: Users, perm: "patients.read" },
   { to: "/appointments", label: "Appointments", icon: CalendarDays, perm: "appointments.read" },
@@ -37,8 +41,9 @@ const NAV: NavItem[] = [
   { to: "/claims", label: "Insurance Claims", icon: Receipt, perm: "claims.read" },
   { to: "/billing", label: "Billing", icon: Wallet, perm: "billing.read" },
   { to: "/analytics", label: "Revenue", icon: Activity },
-  { to: "/telemedicine", label: "Telemedicine", icon: Video, perm: "telemedicine.provider" },
+  { to: "/telemedicine", label: "Telemedicine", icon: Video, perm: "telemedicine.provider", feature: "telemedicine" },
   { to: "/compliance", label: "Compliance", icon: ShieldCheck, perm: "compliance.read" },
+  { to: "/settings/organization", label: "Organization", icon: Building2, perm: "admin.users" },
   { to: "/admin/users", label: "Users & Roles", icon: UserCog, perm: "admin.users" },
   { to: "/admin/schedules", label: "Schedules", icon: CalendarClock, perm: "admin.schedules" },
 ];
@@ -48,7 +53,14 @@ export function AppShell() {
   const searchRef = useRef<HTMLInputElement>(null);
   const [showHelp, setShowHelp] = useState(false);
   const perms = usePermissions();
-  const nav = NAV.filter((n) => !n.perm || perms.has(n.perm as never));
+  const { data: flags } = useOrgFeatureFlags();
+  const featureEnabled = (code?: string) => {
+    if (!code) return true;
+    if (!flags) return true;
+    const f = flags.find((x) => x.code === code);
+    return f ? f.effective : true;
+  };
+  const nav = NAV.filter((n) => (!n.perm || perms.has(n.perm as never)) && featureEnabled(n.feature));
 
   // Global keyboard shortcuts: "/" focus search, "?" toggle help, Esc closes help
   useEffect(() => {
@@ -136,6 +148,7 @@ export function AppShell() {
                 </span>
               </div>
               <CopilotHeaderButton />
+              <ClinicSwitcher />
               <button
                 className="size-10 rounded-lg hover:bg-secondary flex items-center justify-center text-muted-foreground relative hover:shadow-sm btn-press"
                 aria-label="Notifications (2 unread)"
